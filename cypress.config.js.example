@@ -1,0 +1,19 @@
+// change baseUrl to your app apiUrl
+// change loginusername and loginpassword to your local credential
+// copy and rename this file to cypress.config.js
+
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents (on, config) {
+      // implement node event listeners here
+    },
+    baseUrl: '',
+    apiUrl: '',
+    env: {
+      loginUsername: 'customer',
+      loginPassword: 'client123'
+    }
+  }
+})

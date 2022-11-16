@@ -1,0 +1,52 @@
+{
+  "name": "member-masakinaja",
+  "version": "1.0.0",
+  "private": true,
+  "config": {
+    "nuxt": {
+      "host": "0.0.0.0",
+      "port": "8003"
+    }
+  },
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "generate-production": "NODE_ENV=production nuxt generate",
+    "generate-staging": "NODE_ENV=staging nuxt generate",
+    "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
+    "lint": "npm run lint:js",
+    "lintfix": "npm run lint:js -- --fix",
+    "analyze": "nuxt build --analyze",
+    "e2e": "DEBUG=cypress:* cypress open"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/dayjs": "^1.4.1",
+    "@nuxtjs/pwa": "^3.3.5",
+    "core-js": "3.23.1",
+    "lodash.debounce": "^4.0.8",
+    "nuxt": "2.15.8",
+    "v-money": "^0.8.1",
+    "vue": "2.6.14",
+    "vue-server-renderer": "2.6.14",
+    "vue-template-compiler": "2.6.14",
+    "vuetify": "^2.6.1",
+    "vuex-persist": "^3.1.3",
+    "webpack": "4.46.0",
+    "vuex": "3.6.2"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "7.18.2",
+    "@nuxtjs/eslint-config": "8.0.0",
+    "@nuxtjs/eslint-module": "3.1.0",
+    "@nuxtjs/vuetify": "1.12.3",
+    "cypress": "^10.2.0",
+    "cypress-localstorage-commands": "^1.7.0",
+    "eslint": "8.17.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-nuxt": "3.2.0",
+    "eslint-plugin-vue": "8.7.1"
+  }
+}
