@@ -27,7 +27,7 @@ export default {
       },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap'
+        href: 'https://fonts.googleapis.com/css2?family=Mulish&display=swap'
       }
     ]
   },
