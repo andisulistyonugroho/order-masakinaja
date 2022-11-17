@@ -8,7 +8,7 @@
     >
       <TheMenu />
     </v-navigation-drawer>
-    <v-app-bar color="#ffffff" fixed app>
+    <v-app-bar color="#ffffff" fixed app flat>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <span class="title">{{ title }}</span>
       <v-spacer />
@@ -40,6 +40,7 @@
       </v-menu>
     </v-app-bar>
     <v-main class="bg-body">
+      <v-divider />
       <nuxt />
     </v-main>
     <ChangePassword :dialog="changePasswordDialog" @close-it="closeIt" />
@@ -133,8 +134,8 @@ export default {
     },
     async closeIt () {
       this.changePasswordDialog = false
-      if (!this.profile.joinDate) {
-        await this.$axios.patch(`/UserProfiles/${this.profile.id}`, { joinDate: new Date() })
+      if (!this.profile.updated_at) {
+        await this.$supabase.from('profiles').update({ updated_at: new Date() }).match({ id: this.userId })
         await this.$store.dispatch('user/getMyProfile', this.userId)
       }
     }

@@ -5,7 +5,7 @@
         lazy-src="/logo.png"
         src="/logo.png"
         alt="PA"
-        max-height="133"
+        max-height="80"
         contain
         @click="$router.push('/')"
       />
@@ -50,7 +50,7 @@
               </v-list-item-action>
             </v-list-item>
           </v-list-group>
-          <v-list-item v-else :key="sub.id" :to="sub.to" nuxt router>
+          <v-list-item v-else :key="`else-${sub.id}`" :to="sub.to" nuxt router>
             <v-list-item-title v-text="sub.title" />
             <v-list-item-icon>
               <v-icon style="font-size: 19px;">
@@ -61,7 +61,7 @@
         </template>
       </v-list-group>
       <!-- menu without child -->
-      <v-list-item v-else :key="menu.id" :to="menu.to" router>
+      <v-list-item v-else :key="`else-${menu.id}`" :to="menu.to" router>
         <v-list-item-action>
           <v-icon>{{ menu.icon }}</v-icon>
         </v-list-item-action>

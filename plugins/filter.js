@@ -10,6 +10,14 @@ dayjs.extend(duration)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
+Vue.filter('toDayDate', val =>
+  val
+    ? dayjs(val)
+      .local()
+      .format('dddd, DD MMM YYYY')
+    : '-'
+)
+
 Vue.filter('toDate', val =>
   val
     ? dayjs(val)
