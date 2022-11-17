@@ -64,19 +64,6 @@
                     <template #label>
                       <div>
                         Data yang saya isi sudah benar
-                        <!-- <v-tooltip bottom>
-                          <template #activator="{ on }">
-                            <a
-                              target="_blank"
-                              href="#"
-                              @click.stop
-                              v-on="on"
-                            >
-                              S&amp;K
-                            </a>
-                          </template>
-                          Opens in new window
-                        </v-tooltip> -->
                       </div>
                     </template>
                   </v-checkbox>
@@ -133,8 +120,7 @@ export default {
       },
       formData: {
         name: '',
-        wa: '',
-        birthDate: (new Date(2000, 1, 1)).toISOString().substr(0, 10)
+        wa: ''
       },
       waVerification: {
         loading: false
@@ -156,29 +142,36 @@ export default {
   },
   methods: {
     ...mapActions({
-      registerCustomer: 'user/registerCustomer'
+      registerCustomer: 'user/registerCustomer',
+      loginAct: 'user/loginAct'
     }),
     submitForm: debounce(async function () {
       try {
         if (this.$refs.form.validate()) {
           this.$nuxt.$emit('WAIT_DIALOG', true)
-          const { name, wa, birthDate } = this.formData
+          const { name, wa } = this.formData
           const request = {
-            name,
-            email: `${wa}@mailinator.com`,
-            username: wa,
-            wa,
-            birthDate,
-            referrer: this.referrer
+            email: `${wa}@masakinaja.com`,
+            password: `${wa}-istaiddu`
           }
-          await this.registerCustomer(request)
+          const meta = {
+            data: {
+              full_name: name,
+              wa_number: wa
+            }
+          }
+          await this.registerCustomer(request, meta)
+          await this.loginAct({
+            email: `${wa}@masakinaja.com`,
+            password: `${wa}-istaiddu`
+          })
           this.$nuxt.$emit('WAIT_DIALOG', false)
           this.$nuxt.$emit('EAT_SNACKBAR', {
             view: true,
             color: 'success',
             message: 'Kode verifikasi kami kirimkan ke nomer WA anda'
           })
-          this.$router.push(`/verification?wa=${wa}`)
+          this.$router.push('/')
         }
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)

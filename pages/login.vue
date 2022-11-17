@@ -130,7 +130,10 @@ export default {
     async doLogin () {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
-        await this.loginAct(this.formData)
+        await this.loginAct({
+          email: `${this.formData.username}@masakinaja.com`,
+          password: this.formData.password
+        })
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$router.push('/')
       } catch (error) {

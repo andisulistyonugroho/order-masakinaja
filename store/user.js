@@ -18,15 +18,17 @@ export const state = () => ({
 export const actions = {
   async loginAct ({ commit, dispatch }, payload) {
     try {
-      const { data: lData } = await this.$axios.post('/Users/login', {
-        username: `cust:${payload.username}`,
-        password: payload.password
-      })
-      const authData = { ...lData }
-      await commit('setAuthData', authData)
-      await dispatch('getUserRole', authData.userId)
-      await dispatch('getMyProfile', authData.userId)
-      return Promise.resolve(authData)
+      const { user, session, error } = await this.$supabase.auth.signIn(payload)
+      if (error) {
+        throw error
+      }
+      console.log('u:', user)
+      console.log('s:', session)
+      console.log('e:', error)
+      await commit('setAuthData', { id: user.id, token: session.access_token, username: '' })
+      // await dispatch('getUserRole', user)
+      // await dispatch('getMyProfile', user)
+      return Promise.resolve(true)
     } catch (error) {
       return Promise.reject(error)
     }
@@ -152,16 +154,12 @@ export const actions = {
   },
   async registerCustomer ({ commit }, payload) {
     try {
-      const { data: lData } = await this.$axios.post('/Users/registerCustomer', {
-        username: payload.username,
-        fullname: payload.name,
-        email: payload.email,
-        mobile: payload.wa,
-        birthdate: payload.birthDate,
-        referrer: payload.referrer.id
-      })
-      const authData = { ...lData }
-      return Promise.resolve(authData)
+      const { user, session, error } = await this.$supabase.auth.signUp(payload)
+      if (error) {
+        throw error
+      }
+      console.log(session.token_type)
+      return Promise.resolve(user)
     } catch (error) {
       return Promise.reject(error)
     }
@@ -189,8 +187,9 @@ export const actions = {
 
 export const mutations = {
   setAuthData (state, authData) {
+    console.log('SET AUTH DATA:', authData)
     state.id = authData.userId
-    state.token = authData.id
+    state.token = authData.token
     state.username = authData.username
     this.$axios.setToken(state.token)
   },

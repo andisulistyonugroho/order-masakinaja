@@ -83,14 +83,14 @@ export default {
       this.snackbar = theSnack
     })
 
-    this.$store.dispatch('customer/getReferrer', this.refCode)
+    // this.$store.dispatch('customer/getReferrer', this.refCode)
   },
   beforeDestroy () {
     this.$nuxt.$off('EAT_SNACKBAR')
     this.$nuxt.$off('WAIT_DIALOG')
   },
   methods: {
-    openWa (data) {
+    openWa (data = '085262837118') {
       const phone = data.replace('0', '62')
       const message = 'Hai kak, Saya mau mendaftar sebagai customer Masakinaja dari web, boleh tanya-tanya dulu?'
       window.open(
