@@ -71,6 +71,14 @@ export const actions = {
     }
     commit('reset')
     commit('setAll', menuAvailable)
+  },
+  removeArray ({ commit }, payload) {
+    for (let i = 0; i < payload.arr.length; i++) {
+      if (payload.arr[i] === payload.search) {
+        payload.arr.splice(i, 1)
+        i--
+      }
+    }
   }
 }
 

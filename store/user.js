@@ -22,12 +22,8 @@ export const actions = {
       if (error) {
         throw error
       }
-      console.log('u:', user)
-      console.log('s:', session)
-      console.log('e:', error)
       await commit('setAuthData', { id: user.id, token: session.access_token, username: '' })
-      // await dispatch('getUserRole', user)
-      // await dispatch('getMyProfile', user)
+      await dispatch('getMyProfile', user)
       return Promise.resolve(true)
     } catch (error) {
       return Promise.reject(error)
@@ -51,23 +47,13 @@ export const actions = {
   },
   async getMyProfile ({ commit, dispatch }, userId) {
     try {
-      const { data } = await this.$axios
-        .get('/UserProfiles/findOne', {
-          params: {
-            filter: {
-              where: { userId },
-              include: [
-                {
-                  relation: 'users',
-                  scope: {
-                    fields: ['username', 'email']
-                  }
-                },
-                { meAsCustomer: { shippingAddresses: ['Province', 'City', 'District'] } }
-              ]
-            }
-          }
-        })
+      const user = this.$supabase.auth.user()
+      const { data, error } = await this.$supabase.from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      if (error) { throw error }
+
       commit('setProfile', data)
     } catch (error) {
       this._vm.$nuxt.$emit('EAT_SNACKBAR', {
@@ -94,27 +80,6 @@ export const actions = {
       })
       .then((response) => {
         commit('setProfile', response.data)
-      })
-      .catch((error) => {
-        this._vm.$nuxt.$emit('EAT_SNACKBAR', {
-          view: true,
-          color: 'error',
-          message: error
-        })
-      })
-  },
-  setProfileAva ({ commit, dispatch }, data) {
-    this.$axios
-      .patch(`/UserProfiles/${data.profileId}`, {
-        ava: data.ava
-      })
-      .then((response) => {
-        this._vm.$nuxt.$emit('EAT_SNACKBAR', {
-          view: true,
-          color: 'success',
-          message: 'UPDATE PROFILE SUKSES'
-        })
-        dispatch('getProfileByUserId', data.profileId)
       })
       .catch((error) => {
         this._vm.$nuxt.$emit('EAT_SNACKBAR', {
@@ -188,7 +153,7 @@ export const actions = {
 export const mutations = {
   setAuthData (state, authData) {
     console.log('SET AUTH DATA:', authData)
-    state.id = authData.userId
+    state.id = authData.id
     state.token = authData.token
     state.username = authData.username
     this.$axios.setToken(state.token)
