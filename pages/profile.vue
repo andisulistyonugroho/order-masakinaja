@@ -262,7 +262,7 @@ export default {
             npwp: this.npwp,
             taxName: this.taxName,
             taxAddress: this.taxAddress,
-            joinDate: this.profile.joinDate,
+            joinDate: this.profile.updated_at,
             recruiterProfileId: this.recruiterProfileId,
             createdAt: this.profile.createdAt,
             communityId: this.communityId,
