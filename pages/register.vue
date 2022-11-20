@@ -152,15 +152,11 @@ export default {
           const { name, wa } = this.formData
           const request = {
             email: `${wa}@masakinaja.com`,
-            password: `${wa}-istaiddu`
+            password: `${wa}-istaiddu`,
+            full_name: name,
+            wa_number: wa
           }
-          const meta = {
-            data: {
-              full_name: name,
-              wa_number: wa
-            }
-          }
-          await this.registerCustomer(request, meta)
+          await this.registerCustomer(request)
           await this.loginAct({
             email: `${wa}@masakinaja.com`,
             password: `${wa}-istaiddu`
