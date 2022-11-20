@@ -31,7 +31,9 @@ export const actions = {
   },
   async doLogout ({ commit, dispatch }) {
     try {
-      await this.$axios.post('/Users/logout')
+      const { error } = await this.$supabase.auth.signOut()
+      if (error) { throw error }
+
       commit('menu/reset', null, { root: true })
       commit('doLogout')
     } catch (error) {
@@ -119,7 +121,19 @@ export const actions = {
   },
   async registerCustomer ({ commit }, payload) {
     try {
-      const { user, session, error } = await this.$supabase.auth.signUp(payload)
+      console.log('register:', payload)
+      const { user, session, error } = await this.$supabase.auth.signUp(
+        {
+          email: payload.email,
+          password: payload.password
+        },
+        {
+          data: {
+            full_name: payload.full_name,
+            wa_number: payload.wa_number
+          }
+        }
+      )
       if (error) {
         throw error
       }
