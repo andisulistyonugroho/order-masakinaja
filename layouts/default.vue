@@ -26,15 +26,18 @@
             </v-icon>
           </v-btn>
         </template>
-        <v-list dense>
+        <v-list dense class="text-uppercase">
           <v-list-item @click="changePasswordDialog = true">
-            <v-list-item-title>GANTI PASSWORD</v-list-item-title>
+            <v-list-item-title>ganti password</v-list-item-title>
           </v-list-item>
           <v-list-item to="/profile">
-            <v-list-item-title>PROFIL</v-list-item-title>
+            <v-list-item-title>profil</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="manageChildrenDialog = true">
+            <v-list-item-title>data santri</v-list-item-title>
           </v-list-item>
           <v-list-item @click="doLogout">
-            <v-list-item-title>LOGOUT</v-list-item-title>
+            <v-list-item-title>logout</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -43,7 +46,8 @@
       <v-divider />
       <nuxt />
     </v-main>
-    <ChangePassword :dialog="changePasswordDialog" @close-it="closeIt" />
+    <LazyChangePassword :dialog="changePasswordDialog" @close-it="closeIt" />
+    <LazyManageChildren v-if="manageChildrenDialog" :dialog="manageChildrenDialog" @close-it="closeItChildren" />
     <v-overlay v-model="waitDialog" z-index="1000">
       <v-card dark width="250">
         <v-card-subtitle>
@@ -85,7 +89,8 @@ export default {
       waitDialog: false,
       snackbar: { view: false, color: 'success', message: '' },
       icons: [],
-      changePasswordDialog: false
+      changePasswordDialog: false,
+      manageChildrenDialog: false
     }
   },
   computed: {
@@ -138,6 +143,9 @@ export default {
         await this.$supabase.from('profiles').update({ updated_at: new Date() }).match({ id: this.userId })
         await this.$store.dispatch('user/getMyProfile', this.userId)
       }
+    },
+    closeItChildren () {
+      this.manageChildrenDialog = false
     }
   }
 }
