@@ -39,7 +39,12 @@
         @change="getEvents"
       />
     </v-sheet>
-    <OrderInDate :dialog="orderDialog" :selecteddate="selectedDate" @closeit="closeIt" />
+    <OrderInDate
+      :dialog="orderDialog"
+      :selecteddate="selectedDate"
+      :santris="childrens"
+      @closeit="closeIt"
+    />
   </section>
 </template>
 
@@ -63,7 +68,8 @@ export default {
   computed: {
     ...mapState({
       userId: state => state.user.id,
-      profile: state => state.user.profile
+      profile: state => state.user.profile,
+      childrens: state => state.children.mine
     })
   },
   created () {
@@ -112,10 +118,11 @@ export default {
     rnd (a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     },
-    openOrderModel ({ date }) {
+    async openOrderModel ({ date }) {
       this.selectedDate = date
       this.orderDialog = true
       console.log(date)
+      await this.$store.dispatch('children/getChildrens')
     },
     closeIt () {
       this.orderDialog = false

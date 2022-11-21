@@ -4,6 +4,7 @@
     scrollable
     persistent
     :overlay="false"
+    fullscreen
   >
     <v-card tile>
       <v-toolbar flat max-height="54">
@@ -22,9 +23,9 @@
           <li>Buah</li>
         </ul>
         <v-divider />
-        <div v-for="santri in santris" :key="santri.id">
+        <div v-for="santri in santries" :key="santri.id">
           <v-chip
-            class="d-flex mt-2 pl-1"
+            class="d-flex pt-2 pl-1"
             color="transparent"
             label
             @click="checkSantri(santri.id)"
@@ -32,41 +33,57 @@
             <v-icon left color="primary">
               {{ childIds.includes(santri.id) ? `mdi-checkbox-marked-outline` : `mdi-checkbox-blank-outline` }}
             </v-icon>
-            {{ santri.name }}
+            {{ santri.call_name }}
           </v-chip>
-          <v-text-field
+          <v-textarea
+            v-show="childIds.includes(santri.id)"
+            v-model="santri.notes"
             label="Catatan"
+            rows="3"
             dense
             placeholder="tidak ada alergi"
             persistent-placeholder
-            class="caption pt-3 pb-5"
+            class="caption pt-2"
+            auto-grow
+            outlined
+            hide-details
+            clearable
           />
         </div>
       </v-card-text>
-      <v-btn block color="primary" tile depressed>
-        pesan
-      </v-btn>
-      <v-btn text block @click="childIds=[]">
-        batal
-      </v-btn>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text color="primary" rounded @click="childIds=[]">
+          batal
+        </v-btn>
+        <v-btn color="primary" rounded depressed>
+          pesan
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script>
+import cloneDeep from 'lodash.clonedeep'
 export default {
   props: {
     dialog: { type: Boolean, default: false },
-    selecteddate: { type: String, default: '' }
+    selecteddate: { type: String, default: '' },
+    santris: { type: Array, default: null }
   },
   data () {
     return {
-      childIds: [],
-      santris: [
-        { id: 1, name: 'Anak Pertama' },
-        { id: 2, name: 'Anak Kedua' },
-        { id: 3, name: 'Anak Ketiga' }
-      ]
+      childIds: []
     }
+  },
+  computed: {
+    santries () {
+      return cloneDeep(this.santris)
+    }
+  },
+  created () {
+    console.log('order in date')
   },
   methods: {
     checkSantri (id) {
