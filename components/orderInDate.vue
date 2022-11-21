@@ -27,7 +27,7 @@
             class="d-flex pt-2 pl-1"
             color="transparent"
             label
-            @click="checkSantri(santri.id)"
+            @click="checkSantri(santri.id,santri.order_id)"
           >
             <v-icon left color="primary">
               {{ childIds.includes(santri.id) ? `mdi-checkbox-marked-outline` : `mdi-checkbox-blank-outline` }}
@@ -51,7 +51,7 @@
         </div>
       </v-card-text>
       <v-divider />
-      <v-card-actions v-if="childIds.length > 0">
+      <v-card-actions v-if="childIds.length > 0||orderindate.length > 0">
         <v-spacer />
         <v-btn text color="primary" rounded @click="childIds=[]">
           batal
@@ -72,7 +72,8 @@ export default {
     dialog: { type: Boolean, default: false },
     selecteddate: { type: String, default: '' },
     santris: { type: Array, default: null },
-    todaysmenu: { type: Object, default: null }
+    todaysmenu: { type: Object, default: null },
+    orderindate: { type: Array, default: null }
   },
   data () {
     return {
@@ -84,11 +85,24 @@ export default {
       userid: state => state.user.id
     }),
     santries () {
-      return cloneDeep(this.santris)
+      const clones = cloneDeep(this.santris)
+      if (this.orderindate.length > 0) {
+        for (let i = 0; i < this.orderindate.length; i++) {
+          const index = clones.findIndex(obj => obj.id === this.orderindate[i].children_id)
+          clones[index].notes = this.orderindate[i].notes
+          clones[index].order_id = this.orderindate[i].id
+        }
+      }
+      return clones
+    }
+  },
+  watch: {
+    orderindate () {
+      this.childIds = this.orderindate.length > 0 ? this.orderindate.map(obj => obj.children_id) : []
     }
   },
   methods: {
-    checkSantri (id) {
+    checkSantri (id, orderId) {
       if (this.childIds.includes(id) === false) {
         this.childIds.push(id)
       } else {
@@ -109,7 +123,8 @@ export default {
             parent_id: this.userid
           })
         }
-        await this.$store.dispatch('order/addOrder', arrayInput)
+        await console.log(arrayInput)
+        // await this.$store.dispatch('order/addOrder', arrayInput)
         this.$emit('closeit')
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {

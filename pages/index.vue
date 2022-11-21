@@ -44,6 +44,7 @@
       :selecteddate="selectedDate"
       :santris="childrens"
       :todaysmenu="todaysMenu"
+      :orderindate="orderInDate"
       @closeit="closeIt"
     />
   </section>
@@ -74,7 +75,8 @@ export default {
       profile: state => state.user.profile,
       childrens: state => state.children.mine,
       todaysMenu: state => state.order.menu,
-      orders: state => state.order.orders
+      orders: state => state.order.orders,
+      orderInDate: state => state.order.orderInDate
     })
   },
   created () {
@@ -130,6 +132,7 @@ export default {
 
       await this.$store.dispatch('children/getChildrens')
       await this.$store.dispatch('order/getMenuByDate', date)
+      await this.$store.dispatch('order/getOrderInDate', date)
       this.orderDialog = true
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),

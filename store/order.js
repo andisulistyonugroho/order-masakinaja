@@ -1,6 +1,7 @@
 export const state = () => ({
   menu: {},
-  orders: []
+  orders: [],
+  orderInDate: []
 })
 
 export const actions = {
@@ -56,6 +57,26 @@ export const actions = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  async getOrderInDate ({ commit }, date) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .select(`
+          *,
+          childrens(
+            call_name
+          )
+        `)
+        .eq('order_date', date)
+      if (error) { throw error }
+
+      commit('setOrderInDate', data)
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 
@@ -66,7 +87,7 @@ export const mutations = {
   setOrder (state, data) {
     state.orders = data
   },
-  setPaymentBanks (state, data) {
-    state.paymentBanks = data
+  setOrderInDate (state, data) {
+    state.orderInDate = data
   }
 }
