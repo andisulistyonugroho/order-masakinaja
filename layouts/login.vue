@@ -3,7 +3,6 @@
     <div>
       <nuxt />
       <v-btn
-        v-if="referrer"
         color="success"
         dark
         fixed
@@ -12,7 +11,7 @@
         rounded
         :small="$vuetify.breakpoint.mobile"
         :large="!$vuetify.breakpoint.mobile"
-        @click="openWa(referrer.mobile)"
+        @click="openWa(adminphone)"
       >
         <v-icon left>
           mdi-whatsapp
@@ -50,7 +49,6 @@
   </v-app>
 </template>
 <script>
-import { mapState } from 'vuex'
 export default {
   name: 'Login',
   middleware: 'isUnauthenticated',
@@ -58,13 +56,9 @@ export default {
     return {
       snackbar: { view: false, color: 'success', message: '' },
       refCode: this.$route.query.refcode,
-      waitDialog: false
+      waitDialog: false,
+      adminphone: '0812345678910'
     }
-  },
-  computed: {
-    ...mapState({
-      referrer: state => state.customer.referrer
-    })
   },
   created () {
     this.$nuxt.$on('WAIT_DIALOG', (theValue) => {
@@ -82,15 +76,13 @@ export default {
       }
       this.snackbar = theSnack
     })
-
-    // this.$store.dispatch('customer/getReferrer', this.refCode)
   },
   beforeDestroy () {
     this.$nuxt.$off('EAT_SNACKBAR')
     this.$nuxt.$off('WAIT_DIALOG')
   },
   methods: {
-    openWa (data = '085262837118') {
+    openWa (data) {
       const phone = data.replace('0', '62')
       const message = 'Hai kak, Saya mau mendaftar sebagai customer Masakinaja dari web, boleh tanya-tanya dulu?'
       window.open(
