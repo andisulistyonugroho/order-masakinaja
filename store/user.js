@@ -121,7 +121,6 @@ export const actions = {
   },
   async registerCustomer ({ commit }, payload) {
     try {
-      console.log('register:', payload)
       const { user, session, error } = await this.$supabase.auth.signUp(
         {
           email: payload.email,
@@ -134,9 +133,7 @@ export const actions = {
           }
         }
       )
-      if (error) {
-        throw error
-      }
+      if (error) { throw error }
       console.log(session.token_type)
       return Promise.resolve(user)
     } catch (error) {

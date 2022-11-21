@@ -110,6 +110,7 @@ export default {
           })
         }
         await this.$store.dispatch('order/addOrder', arrayInput)
+        this.$emit('closeit')
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)

@@ -52,6 +52,7 @@
 <script>
 import { mapState } from 'vuex'
 import debounce from 'lodash.debounce'
+import dayjs from 'dayjs'
 export default {
   data () {
     return {
@@ -72,7 +73,8 @@ export default {
       userId: state => state.user.id,
       profile: state => state.user.profile,
       childrens: state => state.children.mine,
-      todaysMenu: state => state.order.menu
+      todaysMenu: state => state.order.menu,
+      orders: state => state.order.orders
     })
   },
   created () {
@@ -89,31 +91,32 @@ export default {
     }
   },
   methods: {
-    getEvents ({ start, end }) {
-      const events = []
-
-      const min = new Date(`${start.date}T00:00:00`)
-      const max = new Date(`${end.date}T23:59:59`)
-      const days = (max.getTime() - min.getTime()) / 86400000
-      const eventCount = this.rnd(days, days + 20)
-
-      for (let i = 0; i < eventCount; i++) {
-        const allDay = this.rnd(0, 3) === 0
-        const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-        const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-        const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-        const second = new Date(first.getTime() + secondTimestamp)
-
-        events.push({
-          name: this.names[this.rnd(0, this.names.length - 1)],
-          start: first,
-          end: second,
-          color: this.colors[this.rnd(0, this.colors.length - 1)],
-          timed: !allDay
+    async getEvents () {
+      try {
+        this.$nuxt.$emit('WAIT_DIALOG', true)
+        await this.$store.dispatch('order/getOrderInRange', {
+          start_date: dayjs().startOf('month').utc(),
+          end_date: dayjs().endOf('month').utc()
+        })
+        const events = this.orders.map((obj) => {
+          return {
+            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            name: obj.childrens.call_name,
+            timed: false,
+            start: obj.order_date,
+            end: obj.order_date
+          }
+        })
+        this.events = events
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+      } catch (error) {
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
         })
       }
-
-      this.events = events
     },
     getEventColor (event) {
       return event.color
@@ -124,12 +127,14 @@ export default {
     openOrderModel: debounce(async function ({ date }) {
       this.$nuxt.$emit('WAIT_DIALOG', true)
       this.selectedDate = date
+
       await this.$store.dispatch('children/getChildrens')
       await this.$store.dispatch('order/getMenuByDate', date)
       this.orderDialog = true
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
-    closeIt () {
+    async closeIt () {
+      await this.getEvents()
       this.orderDialog = false
     }
   }
