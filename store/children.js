@@ -17,15 +17,47 @@ export const actions = {
       return Promise.reject(error)
     }
   },
-  async getReferrer ({ commit }, input) {
+  async addChild ({ commit, rootState }, input) {
     try {
-      const { data } = await this.$axios.post('Users/getWANumber', {
-        ba_refcode: input,
-        requester: 'member-masakinaja'
-      })
-      commit('setReferrer', data)
+      const { data, error } = await this.$supabase
+        .from('childrens')
+        .insert([{
+          parent_id: rootState.user.id,
+          full_name: input.fullName,
+          call_name: input.callName,
+          level: input.level,
+          class_room: input.classRoom,
+          gender: input.gender,
+          notes: input.notes,
+          managed_by: rootState.user.id
+        }])
+      if (error) { throw error }
+
+      return Promise.resolve(data)
     } catch (error) {
-      return error
+      return Promise.reject(error)
+    }
+  },
+  async editChild ({ commit, rootState }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('childrens')
+        .update({
+          parent_id: rootState.user.id,
+          full_name: input.fullName,
+          call_name: input.callName,
+          level: input.level,
+          class_room: input.classRoom,
+          gender: input.gender,
+          notes: input.notes,
+          managed_by: rootState.user.id
+        })
+        .match({ id: input.childId })
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
     }
   }
 }

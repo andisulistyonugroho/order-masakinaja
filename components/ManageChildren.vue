@@ -16,7 +16,10 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-card-text v-show="manageData" class="pt-5">
+      <v-card-text v-show="manageData" class="pt-2">
+        <div class="font-weight-bold pb-3 primary--text">
+          {{ childId ? `Edit Data Lama` : `Tambah Data Baru` }}
+        </div>
         <v-form ref="formManageChildren" lazy-validation>
           <v-select
             v-model="gender"
@@ -60,7 +63,7 @@
         </v-form>
         <div class="d-flex">
           <v-spacer />
-          <v-btn color="primary" text rounded @click="manageData = false">
+          <v-btn color="primary" text rounded @click="manageData = false;$refs.formManageChildren.reset();childId = null;">
             batal
           </v-btn>
           <v-btn color="primary" depressed rounded @click="doSave">
@@ -70,14 +73,14 @@
       </v-card-text>
       <v-card-text v-show="!manageData" class="pt-5">
         <v-sheet v-for="child in childrens" :key="child.id">
-          <div class="font-weight-bold">
+          <div class="font-weight-bold primary--text">
             {{ child.call_name }} - {{ child.full_name }}
           </div>
           <div>{{ child.level }} {{ child.class_room }}</div>
           <div>{{ child.notes }}</div>
           <div class="d-flex">
             <v-spacer />
-            <v-btn x-small color="primary" depressed rounded>
+            <v-btn x-small color="primary" depressed rounded @click="openEditForm(child)">
               edit
             </v-btn>
           </div>
@@ -127,7 +130,8 @@ export default {
       fullName: null,
       callName: null,
       gender: null,
-      notes: null
+      notes: null,
+      childId: null
     }
   },
   computed: {
@@ -155,20 +159,27 @@ export default {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
         if (this.$refs.formManageChildren.validate()) {
-          const { data, error } = await this.$supabase
-            .from('childrens')
-            .insert([{
-              parent_id: this.userid,
-              full_name: this.fullName,
-              call_name: this.callName,
+          if (this.childId) {
+            await this.$store.dispatch('children/editChild', {
+              fullName: this.fullName,
+              callName: this.callName,
               level: this.level,
-              class_room: this.classRoom,
+              classRoom: this.classRoom,
               gender: this.gender,
               notes: this.notes,
-              managed_by: this.userid
-            }])
-          if (error) { throw error }
-          await this.getChildrens(data)
+              childId: this.childId
+            })
+          } else {
+            await this.$store.dispatch('children/addChild', {
+              fullName: this.fullName,
+              callName: this.callName,
+              level: this.level,
+              classRoom: this.classRoom,
+              gender: this.gender,
+              notes: this.notes
+            })
+          }
+          await this.getChildrens()
           this.$refs.formManageChildren.reset()
           this.manageData = false
         }
@@ -195,7 +206,17 @@ export default {
           message: error
         })
       }
-    }
+    },
+    openEditForm: debounce(function (data) {
+      this.childId = data.id
+      this.fullName = data.full_name
+      this.callName = data.call_name
+      this.level = data.level
+      this.classRoom = data.class_room
+      this.gender = data.gender
+      this.notes = data.notes
+      this.manageData = true
+    }, 1000, { leading: true, trailing: false })
   }
 }
 </script>
