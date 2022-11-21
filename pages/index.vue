@@ -59,7 +59,7 @@ export default {
       type: 'month',
       mode: 'stack',
       modes: ['stack', 'column'],
-      weekday: [0, 1, 2, 3, 4, 5, 6],
+      weekday: [1, 2, 3, 4],
       value: '',
       events: [],
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
@@ -100,7 +100,7 @@ export default {
         })
         const events = this.orders.map((obj) => {
           return {
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            color: 'cyan',
             name: obj.childrens.call_name,
             timed: false,
             start: obj.order_date,
