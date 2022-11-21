@@ -16,7 +16,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-card-text v-show="manageData">
+      <v-card-text v-show="manageData" class="pt-5">
         <v-form ref="formManageChildren" lazy-validation>
           <v-select
             v-model="gender"
@@ -45,6 +45,12 @@
             :items="classRooms"
             label="Kelas*"
           />
+          <v-textarea
+            v-model="notes"
+            label="Alergi/Catatan Lain"
+            placeholder="Tidak ada alergi"
+            persistent-placeholder
+          />
           <v-checkbox
             v-model="checkbox"
             :rules="[v => !!v || 'Harus dicentang untuk melanjutkan!']"
@@ -57,12 +63,15 @@
           <v-btn color="primary" text rounded @click="manageData = false">
             batal
           </v-btn>
-          <v-btn color="primary" depressed rounded @click="doEditPassword">
+          <v-btn color="primary" depressed rounded @click="doSave">
             simpan
           </v-btn>
         </div>
       </v-card-text>
       <v-card-text v-show="!manageData">
+        <v-sheet>
+          {{ childrens }}
+        </v-sheet>
         <v-fab-transition>
           <v-btn
             color="primary"
@@ -83,6 +92,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import debounce from 'lodash.debounce'
 export default {
   props: {
@@ -110,6 +120,10 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      userid: state => state.user.id,
+      childrens: state => state.children.mine
+    }),
     classRooms () {
       let value = []
       if (this.level) {
@@ -122,39 +136,55 @@ export default {
       return value
     }
   },
-  watch: {
-    dialog (val) {
-      if (!val) {
-        this.$refs.formManageChildren.reset()
-      }
-    }
+  async created () {
+    await this.getChildrens()
   },
   methods: {
-    doEditPassword: debounce(function () {
-      if (this.$refs.formManageChildren.validate()) {
+    doSave: debounce(async function () {
+      try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
-        this.$axios.post('/Users/change-password', {
-          oldPassword: this.oldPassword,
-          newPassword: this.newPassword
-        }).then((response) => {
+        if (this.$refs.formManageChildren.validate()) {
+          const { data, error } = await this.$supabase
+            .from('childrens')
+            .insert([{
+              parent_id: this.userid,
+              full_name: this.fullName,
+              call_name: this.callName,
+              level: this.level,
+              class_room: this.classRoom,
+              gender: this.gender,
+              notes: this.notes,
+              managed_by: this.userid
+            }])
+          if (error) { throw error }
+          this.childrens.push(data)
           this.$refs.formManageChildren.reset()
-          this.$emit('close-it')
-          this.$nuxt.$emit('WAIT_DIALOG', false)
-          this.$nuxt.$emit('EAT_SNACKBAR', {
-            view: true,
-            color: 'success',
-            message: 'Password berhasil diubah'
-          })
-        }).catch((error) => {
-          this.$nuxt.$emit('WAIT_DIALOG', false)
-          this.$nuxt.$emit('EAT_SNACKBAR', {
-            view: true,
-            color: 'error',
-            message: error
-          })
+          this.manageData = false
+        }
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+      } catch (error) {
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
         })
       }
-    }, 1500, { leading: true, trailing: false })
+    }, 1000, { leading: true, trailing: false }),
+    async getChildrens () {
+      try {
+        this.$nuxt.$emit('WAIT_DIALOG', true)
+        await this.$store.dispatch('children/getChildrens')
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+      } catch (error) {
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
+        })
+      }
+    }
   }
 }
 </script>
