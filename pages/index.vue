@@ -43,6 +43,7 @@
       :dialog="orderDialog"
       :selecteddate="selectedDate"
       :santris="childrens"
+      :todaysmenu="todaysMenu"
       @closeit="closeIt"
     />
   </section>
@@ -50,6 +51,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import debounce from 'lodash.debounce'
 export default {
   data () {
     return {
@@ -69,7 +71,8 @@ export default {
     ...mapState({
       userId: state => state.user.id,
       profile: state => state.user.profile,
-      childrens: state => state.children.mine
+      childrens: state => state.children.mine,
+      todaysMenu: state => state.order.menu
     })
   },
   created () {
@@ -118,12 +121,14 @@ export default {
     rnd (a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     },
-    async openOrderModel ({ date }) {
+    openOrderModel: debounce(async function ({ date }) {
+      this.$nuxt.$emit('WAIT_DIALOG', true)
       this.selectedDate = date
-      this.orderDialog = true
-      console.log(date)
       await this.$store.dispatch('children/getChildrens')
-    },
+      await this.$store.dispatch('order/getMenuByDate', date)
+      this.orderDialog = true
+      this.$nuxt.$emit('WAIT_DIALOG', false)
+    }, 1000, { leading: true, trailing: false }),
     closeIt () {
       this.orderDialog = false
     }
