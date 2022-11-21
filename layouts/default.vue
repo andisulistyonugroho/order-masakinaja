@@ -84,7 +84,7 @@ export default {
   middleware: 'isAuthenticated',
   data () {
     return {
-      drawer: true,
+      drawer: !this.$vuetify.breakpoint.mobile,
       title: '',
       waitDialog: false,
       snackbar: { view: false, color: 'success', message: '' },
