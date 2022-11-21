@@ -68,9 +68,20 @@
           </v-btn>
         </div>
       </v-card-text>
-      <v-card-text v-show="!manageData">
-        <v-sheet>
-          {{ childrens }}
+      <v-card-text v-show="!manageData" class="pt-5">
+        <v-sheet v-for="child in childrens" :key="child.id">
+          <div class="font-weight-bold">
+            {{ child.call_name }} - {{ child.full_name }}
+          </div>
+          <div>{{ child.level }} {{ child.class_room }}</div>
+          <div>{{ child.notes }}</div>
+          <div class="d-flex">
+            <v-spacer />
+            <v-btn x-small color="primary" depressed rounded>
+              edit
+            </v-btn>
+          </div>
+          <v-divider class="my-5" />
         </v-sheet>
         <v-fab-transition>
           <v-btn
@@ -157,7 +168,7 @@ export default {
               managed_by: this.userid
             }])
           if (error) { throw error }
-          this.childrens.push(data)
+          await this.getChildrens(data)
           this.$refs.formManageChildren.reset()
           this.manageData = false
         }
