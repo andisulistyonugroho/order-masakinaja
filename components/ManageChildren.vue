@@ -79,7 +79,6 @@
           <div>{{ child.level }} {{ child.class_room }}</div>
           <div>{{ child.notes }}</div>
           <div class="d-flex">
-            <v-spacer />
             <v-btn x-small color="primary" depressed rounded @click="openEditForm(child)">
               edit
             </v-btn>
