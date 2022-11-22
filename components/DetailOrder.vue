@@ -47,44 +47,35 @@
           </div>
           <v-divider class="mt-2 pb-2" />
         </div>
-        <v-btn block color="primary" dark>
-          text
+        <v-btn
+          v-if="canAddNewOrder"
+          block
+          color="primary"
+          outlined
+          rounded
+          @click="addOrderD = true"
+        >
+          tambah pesanan
         </v-btn>
-        <!-- <div v-for="santri in santries" :key="santri.id">
-          <v-chip
-            class="d-flex pt-2 pl-1"
-            color="transparent"
-            label
-            @click="checkSantri(santri.id,santri.order_id)"
-          >
-            <v-icon left color="primary">
-              {{ childIds.includes(santri.id) ? `mdi-checkbox-marked-outline` : `mdi-checkbox-blank-outline` }}
-            </v-icon>
-            {{ santri.call_name }}
-          </v-chip>
-          <v-textarea
-            v-show="childIds.includes(santri.id)"
-            v-model="santri.notes"
-            label="Catatan"
-            rows="3"
-            dense
-            placeholder="tidak ada alergi"
-            persistent-placeholder
-            class="caption pt-2"
-            auto-grow
-            outlined
-            hide-details
-            clearable
-          />
-        </div> -->
       </v-card-text>
     </v-card>
-    <LazyOrderDetailEditNotes :dialog="editNoteD" :orderdetail="editedOrderDetail" @closeit="closeEditNoteD" />
+    <LazyOrderDetailEditNotes
+      :dialog="editNoteD"
+      :orderdetail="editedOrderDetail"
+      @closeit="closeEditNoteD"
+    />
+    <LazyOrderDetailAddOrder
+      v-if="addOrderD"
+      :dialog="addOrderD"
+      :selecteddate="selecteddate"
+      :orderindate="orderindate"
+      :santris="santris"
+      @closeit="closeEditNoteD"
+    />
   </v-dialog>
 </template>
 <script>
 import cloneDeep from 'lodash.clonedeep'
-import debounce from 'lodash.debounce'
 import { mapState } from 'vuex'
 export default {
   props: {
@@ -102,7 +93,8 @@ export default {
         order_id: null,
         order_notes: null,
         call_name: null
-      }
+      },
+      addOrderD: false
     }
   },
   computed: {
@@ -122,6 +114,12 @@ export default {
     },
     editedChildName () {
       return this.editedOrderId ? this.orderindate.find(obj => obj.id === this.editedOrderId).childrens.call_name : ''
+    },
+    canAddNewOrder () {
+      const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
+      const thistime = this.$dayjs()
+
+      return thistime.isBefore(lastchance) && this.santries.length > this.orderindate.length
     }
   },
   watch: {
@@ -140,37 +138,9 @@ export default {
         this.$store.dispatch('menu/removeArray', { arr: this.childIds, search: id })
       }
     },
-    doOrder: debounce(async function () {
-      try {
-        this.$nuxt.$emit('WAIT_DIALOG', true)
-        const arrayInput = []
-        for (let i = 0; i < this.childIds.length; i++) {
-          const santri = this.santries.find(obj => obj.id === this.childIds[i])
-          arrayInput.push({
-            children_id: this.childIds[i],
-            order_date: this.selecteddate,
-            cooked_menus_id: this.cookedmenusid,
-            notes: santri.notes,
-            parent_id: this.userid
-          })
-        }
-        await console.log(arrayInput)
-        // await this.$store.dispatch('order/addOrder', arrayInput)
-        this.$emit('closeit')
-        this.$nuxt.$emit('WAIT_DIALOG', false)
-      } catch (error) {
-        this.$nuxt.$emit('WAIT_DIALOG', false)
-        this.$nuxt.$emit('EAT_SNACKBAR', {
-          view: true,
-          color: 'error',
-          message: error
-        })
-      }
-    }, 1000, { leading: true, trailing: false }),
     openEditNotes (input) {
       const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
       const thistime = this.$dayjs()
-      console.log(thistime.isBefore(lastchance))
       if (thistime.isBefore(lastchance)) {
         this.editedOrderDetail = {
           order_id: input.id,
@@ -185,8 +155,6 @@ export default {
     openCancelingNotes (input) {
       const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
       const thistime = this.$dayjs()
-      console.log(thistime.format(), ' is before ', lastchance.format())
-      console.log(thistime.isBefore(lastchance))
       if (thistime.isBefore(lastchance)) {
         this.editedOrderDetail = {
           order_id: input.id,
@@ -206,6 +174,7 @@ export default {
         call_name: null
       }
       this.editNoteD = false
+      this.addOrderD = false
       this.$emit('refreshorderdetail', this.selecteddate)
     }
   }

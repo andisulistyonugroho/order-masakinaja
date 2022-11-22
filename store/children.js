@@ -10,6 +10,7 @@ export const actions = {
         .from('childrens')
         .select()
         .eq('parent_id', userid)
+        .eq('is_active', true)
       if (error) { throw error }
       commit('setMine', data)
       return Promise.resolve(true)

@@ -163,7 +163,6 @@ export const actions = {
 
 export const mutations = {
   setAuthData (state, authData) {
-    console.log('SET AUTH DATA:', authData)
     state.id = authData.id
     state.token = authData.token
     state.username = authData.username
