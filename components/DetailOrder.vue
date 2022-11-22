@@ -31,14 +31,14 @@
           </div>
           <div class="d-flex pt-2">
             <v-spacer />
-            <v-btn color="primary" x-small depressed text rounded>
+            <v-btn color="primary" small depressed text rounded>
               batalkan order
             </v-btn>
-            <v-btn color="primary" x-small depressed rounded>
+            <v-btn color="primary" small depressed rounded @click="openEditNotes({id:order.id,notes:order.notes})">
               edit catatan
             </v-btn>
           </div>
-          <v-divider class="pb-2" />
+          <v-divider class="mt-2 pb-2" />
         </div>
         <!-- <div v-for="santri in santries" :key="santri.id">
           <v-chip
@@ -79,6 +79,38 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+    <v-dialog
+      v-model="editNoteD"
+      scrollable
+      persistent
+    >
+      <v-card tile>
+        <v-card-title>
+          Edit Catatan {{ editedChildName }}
+        </v-card-title>
+        <v-card-text class="pb-0">
+          <v-textarea
+            v-model="editedOrderNotes"
+            outlined
+          />
+        </v-card-text>
+        <!-- <v-card-actions> -->
+        <v-btn block color="primary" tile depressed>
+          Simpan
+        </v-btn>
+        <v-btn
+          block
+          color="primary"
+          text
+          tile
+          @click="closeEditNoteD"
+        >
+          Tutup
+        </v-btn>
+
+        <!-- </v-card-actions> -->
+      </v-card>
+    </v-dialog>
   </v-dialog>
 </template>
 <script>
@@ -95,7 +127,10 @@ export default {
   },
   data () {
     return {
-      childIds: []
+      childIds: [],
+      editNoteD: false,
+      editedOrderId: null,
+      editedOrderNotes: null
     }
   },
   computed: {
@@ -112,6 +147,9 @@ export default {
         }
       }
       return clones
+    },
+    editedChildName () {
+      return this.editedOrderId ? this.orderindate.find(obj => obj.id === this.editedOrderId).childrens.call_name : ''
     }
   },
   watch: {
@@ -156,7 +194,17 @@ export default {
           message: error
         })
       }
-    })
+    }, 1000, { leading: true, trailing: false }),
+    openEditNotes (input) {
+      this.editedOrderId = input.id
+      this.editedOrderNotes = input.notes
+      this.editNoteD = true
+    },
+    closeEditNoteD () {
+      this.editedOrderId = null
+      this.editedOrderNotes = null
+      this.editNoteD = false
+    }
   }
 }
 </script>
