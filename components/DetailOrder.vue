@@ -31,7 +31,14 @@
           </div>
           <div class="d-flex pt-2">
             <v-spacer />
-            <v-btn color="primary" small depressed text rounded>
+            <v-btn
+              color="primary"
+              small
+              depressed
+              text
+              rounded
+              @click="openCancelingNotes(order)"
+            >
               batalkan order
             </v-btn>
             <v-btn color="primary" small depressed rounded @click="openEditNotes(order)">
@@ -68,16 +75,6 @@
           />
         </div> -->
       </v-card-text>
-      <v-divider />
-      <v-card-actions v-if="childIds.length > 0">
-        <v-spacer />
-        <v-btn text color="primary" rounded @click="childIds=[]">
-          batal
-        </v-btn>
-        <v-btn color="primary" rounded depressed @click="doOrder">
-          pesan
-        </v-btn>
-      </v-card-actions>
     </v-card>
     <LazyOrderDetailEditNotes :dialog="editNoteD" :orderdetail="editedOrderDetail" @closeit="closeEditNoteD" />
   </v-dialog>
@@ -172,6 +169,15 @@ export default {
         order_id: input.id,
         order_notes: input.notes,
         call_name: input.childrens.call_name
+      }
+      this.editNoteD = true
+    },
+    openCancelingNotes (input) {
+      this.editedOrderDetail = {
+        order_id: input.id,
+        order_notes: 'Batal karena',
+        call_name: input.childrens.call_name,
+        is_active: false
       }
       this.editNoteD = true
     },

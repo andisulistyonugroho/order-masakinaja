@@ -6,7 +6,7 @@
   >
     <v-card tile>
       <v-card-title>
-        Edit Catatan {{ orderdetail.call_name }}
+        {{ orderdetail.is_active === false ? `Alasan Pembatalan` : `Edit Catatan` }} {{ orderdetail.call_name }}
       </v-card-title>
       <v-card-text class="pb-0">
         <v-form ref="form">
@@ -16,7 +16,7 @@
           />
         </v-form>
       </v-card-text>
-      <v-btn block color="primary" tile depressed @click="doUpdate()">
+      <v-btn block color="primary" tile depressed @click="orderdetail.is_active === false ? doDelete() : doUpdate()">
         Simpan
       </v-btn>
       <v-btn
@@ -78,7 +78,7 @@ export default {
     doDelete: debounce(async function () {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
-        await this.$store.dispatch('order/updateOrder', { id: this.orderdetail.id, notes: this.notes, is_active: false })
+        await this.$store.dispatch('order/updateOrder', { id: this.orderdetail.order_id, notes: this.notes, is_active: false })
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$nuxt.$emit('EAT_SNACKBAR', {
           view: true,
