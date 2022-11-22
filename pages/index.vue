@@ -136,18 +136,20 @@ export default {
     rnd (a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     },
-    openOrderModel: debounce(async function ({ date }) {
+    openOrderModel: debounce(async function ({ date, past, present }) {
       this.$nuxt.$emit('WAIT_DIALOG', true)
-      this.selectedDate = date
+      await this.$store.dispatch('order/getOrderInDate', date)
 
       await this.$store.dispatch('children/getChildrens')
       await this.$store.dispatch('order/getMenuByDate', date)
-      await this.$store.dispatch('order/getOrderInDate', date)
 
+      this.selectedDate = date
       if (this.orderInDate.length > 0) {
         this.detailOrderDialog = true
-      } else {
+      } else if (past === false && present === false) {
         this.orderDialog = true
+      } else {
+        alert('tidak ada order')
       }
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
