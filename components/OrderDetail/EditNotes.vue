@@ -12,7 +12,8 @@
         <v-form ref="form">
           <v-textarea
             v-model="notes"
-            outlined
+            auto-grow
+            rows="2"
           />
         </v-form>
       </v-card-text>

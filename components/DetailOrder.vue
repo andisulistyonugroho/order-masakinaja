@@ -19,7 +19,7 @@
         <div class="font-weight-bold">
           Menu:
         </div>
-        <span v-if="todaysmenu && todaysmenu.cooked_menus" class="caption" style="white-space: pre-line">{{ todaysmenu.cooked_menus.details }}</span>
+        <span v-if="todaysmenu && todaysmenu.cooked_menus" style="white-space: pre-line">{{ todaysmenu.cooked_menus.details }}</span>
         <span v-else>belum diinput</span>
         <v-divider class="mt-2 pb-2" />
         <div v-for="order in orderindate" :key="order.id">
@@ -47,6 +47,9 @@
           </div>
           <v-divider class="mt-2 pb-2" />
         </div>
+        <v-btn block color="primary" dark>
+          text
+        </v-btn>
         <!-- <div v-for="santri in santries" :key="santri.id">
           <v-chip
             class="d-flex pt-2 pl-1"
@@ -165,21 +168,36 @@ export default {
       }
     }, 1000, { leading: true, trailing: false }),
     openEditNotes (input) {
-      this.editedOrderDetail = {
-        order_id: input.id,
-        order_notes: input.notes,
-        call_name: input.childrens.call_name
+      const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
+      const thistime = this.$dayjs()
+      console.log(thistime.isBefore(lastchance))
+      if (thistime.isBefore(lastchance)) {
+        this.editedOrderDetail = {
+          order_id: input.id,
+          order_notes: input.notes,
+          call_name: input.childrens.call_name
+        }
+        this.editNoteD = true
+      } else {
+        alert('Afwan, edit catatan terakhir pukul 7:00 pagi')
       }
-      this.editNoteD = true
     },
     openCancelingNotes (input) {
-      this.editedOrderDetail = {
-        order_id: input.id,
-        order_notes: 'Batal karena',
-        call_name: input.childrens.call_name,
-        is_active: false
+      const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
+      const thistime = this.$dayjs()
+      console.log(thistime.format(), ' is before ', lastchance.format())
+      console.log(thistime.isBefore(lastchance))
+      if (thistime.isBefore(lastchance)) {
+        this.editedOrderDetail = {
+          order_id: input.id,
+          order_notes: 'Batal karena',
+          call_name: input.childrens.call_name,
+          is_active: false
+        }
+        this.editNoteD = true
+      } else {
+        alert('Afwan, pembatalan terakhir pukul 7:00 pagi')
       }
-      this.editNoteD = true
     },
     closeEditNoteD () {
       this.editedOrderDetail = {
