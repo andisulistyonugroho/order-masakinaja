@@ -54,6 +54,7 @@
       :orderindate="orderInDate"
       :todaysmenu="todaysMenu"
       @closeit="closeIt"
+      @refreshorderdetail="refreshOrderDetail"
     />
   </section>
 </template>
@@ -142,7 +143,7 @@ export default {
       await this.$store.dispatch('children/getChildrens')
       await this.$store.dispatch('order/getMenuByDate', date)
       await this.$store.dispatch('order/getOrderInDate', date)
-      console.log(this.orderInDate)
+
       if (this.orderInDate.length > 0) {
         this.detailOrderDialog = true
       } else {
@@ -154,6 +155,9 @@ export default {
       await this.getEvents()
       this.orderDialog = false
       this.detailOrderDialog = false
+    },
+    async refreshOrderDetail (date) {
+      await this.$store.dispatch('order/getOrderInDate', date)
     }
   }
 }

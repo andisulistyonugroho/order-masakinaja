@@ -78,6 +78,19 @@ export const actions = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  async updateOrder ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .update(input)
+        .eq('id', input.id)
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 

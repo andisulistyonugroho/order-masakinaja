@@ -34,7 +34,7 @@
             <v-btn color="primary" small depressed text rounded>
               batalkan order
             </v-btn>
-            <v-btn color="primary" small depressed rounded @click="openEditNotes({id:order.id,notes:order.notes})">
+            <v-btn color="primary" small depressed rounded @click="openEditNotes(order)">
               edit catatan
             </v-btn>
           </div>
@@ -79,38 +79,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-    <v-dialog
-      v-model="editNoteD"
-      scrollable
-      persistent
-    >
-      <v-card tile>
-        <v-card-title>
-          Edit Catatan {{ editedChildName }}
-        </v-card-title>
-        <v-card-text class="pb-0">
-          <v-textarea
-            v-model="editedOrderNotes"
-            outlined
-          />
-        </v-card-text>
-        <!-- <v-card-actions> -->
-        <v-btn block color="primary" tile depressed>
-          Simpan
-        </v-btn>
-        <v-btn
-          block
-          color="primary"
-          text
-          tile
-          @click="closeEditNoteD"
-        >
-          Tutup
-        </v-btn>
-
-        <!-- </v-card-actions> -->
-      </v-card>
-    </v-dialog>
+    <LazyOrderDetailEditNotes :dialog="editNoteD" :orderdetail="editedOrderDetail" @closeit="closeEditNoteD" />
   </v-dialog>
 </template>
 <script>
@@ -129,8 +98,11 @@ export default {
     return {
       childIds: [],
       editNoteD: false,
-      editedOrderId: null,
-      editedOrderNotes: null
+      editedOrderDetail: {
+        order_id: null,
+        order_notes: null,
+        call_name: null
+      }
     }
   },
   computed: {
@@ -196,14 +168,21 @@ export default {
       }
     }, 1000, { leading: true, trailing: false }),
     openEditNotes (input) {
-      this.editedOrderId = input.id
-      this.editedOrderNotes = input.notes
+      this.editedOrderDetail = {
+        order_id: input.id,
+        order_notes: input.notes,
+        call_name: input.childrens.call_name
+      }
       this.editNoteD = true
     },
     closeEditNoteD () {
-      this.editedOrderId = null
-      this.editedOrderNotes = null
+      this.editedOrderDetail = {
+        order_id: null,
+        order_notes: null,
+        call_name: null
+      }
       this.editNoteD = false
+      this.$emit('refreshorderdetail', this.selecteddate)
     }
   }
 }
