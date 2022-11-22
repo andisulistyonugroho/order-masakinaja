@@ -47,6 +47,7 @@ export const actions = {
             call_name
           )
         `)
+        .eq('is_active', true)
         .gte('order_date', input.start_date)
         .lte('order_date', input.end_date)
       if (error) { throw error }
