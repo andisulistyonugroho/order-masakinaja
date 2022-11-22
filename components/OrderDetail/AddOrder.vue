@@ -11,20 +11,29 @@
       <v-card-text class="pb-0">
         <v-form ref="form">
           <v-select
+            v-model="children_id"
             :items="availableSantris"
             label="Nama Santri*"
             :rules="[v => !!v || 'Data ini tidak boleh kosong']"
             item-text="call_name"
             item-value="id"
-          />
+          >
+            <template #selection="data">
+              {{ data.item.call_name }}: {{ data.item.full_name }}
+            </template>
+            <template #item="data">
+              {{ data.item.call_name }}: {{ data.item.full_name }}
+            </template>
+          </v-select>
           <v-textarea
             v-model="notes"
+            label="Catatan"
             auto-grow
             rows="2"
           />
         </v-form>
       </v-card-text>
-      <v-btn block color="primary" tile depressed @click="orderdetail.is_active === false ? doDelete() : doUpdate()">
+      <v-btn block color="primary" tile depressed @click="doCreate">
         Simpan
       </v-btn>
       <v-btn
@@ -41,6 +50,7 @@
 </template>
 <script>
 import debounce from 'lodash.debounce'
+import { mapState } from 'vuex'
 export default {
   props: {
     dialog: { type: Boolean, default: false },
@@ -51,51 +61,47 @@ export default {
   data () {
     return {
       notes: null,
-      availableSantris: []
+      availableSantris: [],
+      children_id: null
+    }
+  },
+  computed: {
+    ...mapState({
+      userid: state => state.user.id
+    })
+  },
+  watch: {
+    children_id (val) {
+      this.notes = val ? this.availableSantris.find(obj => obj.id === val).notes : null
     }
   },
   created () {
-    console.log('add orde created')
     const childrenIds = this.orderindate.map(obj => obj.children_id)
     this.availableSantris = this.santris.filter(obj => !childrenIds.includes(obj.id))
-    console.log('AVAIL:', this.availableSantris)
   },
   methods: {
     closeAddOrderD () {
       this.$refs.form.reset()
       this.$emit('closeit')
     },
-    doUpdate: debounce(async function () {
+    doCreate: debounce(async function () {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
-        await this.$store.dispatch('order/updateOrder', { id: this.orderdetail.order_id, notes: this.notes })
+        const arrayInput = [{
+          children_id: this.children_id,
+          order_date: this.selecteddate,
+          cooked_menus_id: this.orderindate.cooked_menu_id,
+          notes: this.notes,
+          parent_id: this.userid
+        }]
+        await this.$store.dispatch('order/addOrder', arrayInput)
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$nuxt.$emit('EAT_SNACKBAR', {
           view: true,
           color: 'success',
           message: 'Berhasil diupdate'
         })
-        this.closeEditNoteD()
-      } catch (error) {
-        this.$nuxt.$emit('WAIT_DIALOG', false)
-        this.$nuxt.$emit('EAT_SNACKBAR', {
-          view: true,
-          color: 'error',
-          message: error
-        })
-      }
-    }, 1000, { leading: true, trailing: false }),
-    doDelete: debounce(async function () {
-      try {
-        this.$nuxt.$emit('WAIT_DIALOG', true)
-        await this.$store.dispatch('order/updateOrder', { id: this.orderdetail.order_id, notes: this.notes, is_active: false })
-        this.$nuxt.$emit('WAIT_DIALOG', false)
-        this.$nuxt.$emit('EAT_SNACKBAR', {
-          view: true,
-          color: 'success',
-          message: 'Berhasil dihapus'
-        })
-        this.closeEditNoteD()
+        this.closeAddOrderD()
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$nuxt.$emit('EAT_SNACKBAR', {
