@@ -69,6 +69,7 @@ export const actions = {
           )
         `)
         .eq('order_date', date)
+        .eq('is_active', true)
       if (error) { throw error }
 
       commit('setOrderInDate', data)

@@ -8,7 +8,7 @@
   >
     <v-card tile>
       <v-toolbar dark flat max-height="54" color="primary">
-        Order baru: {{ selecteddate|toDayDate }}
+        Detail order: {{ selecteddate|toDayDate }}
         <v-spacer />
         <v-btn icon small @click="$emit('closeit')">
           <v-icon>mdi-close</v-icon>
@@ -21,8 +21,26 @@
         </div>
         <span v-if="todaysmenu && todaysmenu.cooked_menus" class="caption" style="white-space: pre-line">{{ todaysmenu.cooked_menus.details }}</span>
         <span v-else>belum diinput</span>
-        <v-divider />
-        <div v-for="santri in santries" :key="santri.id">
+        <v-divider class="mt-2 pb-2" />
+        <div v-for="order in orderindate" :key="order.id">
+          <div class="font-weight-bold primary--text">
+            {{ order.childrens.call_name }}
+          </div>
+          <div>
+            {{ order.notes }}
+          </div>
+          <div class="d-flex pt-2">
+            <v-spacer />
+            <v-btn color="primary" x-small depressed text rounded>
+              batalkan order
+            </v-btn>
+            <v-btn color="primary" x-small depressed rounded>
+              edit catatan
+            </v-btn>
+          </div>
+          <v-divider class="pb-2" />
+        </div>
+        <!-- <div v-for="santri in santries" :key="santri.id">
           <v-chip
             class="d-flex pt-2 pl-1"
             color="transparent"
@@ -48,7 +66,7 @@
             hide-details
             clearable
           />
-        </div>
+        </div> -->
       </v-card-text>
       <v-divider />
       <v-card-actions v-if="childIds.length > 0">
@@ -72,7 +90,8 @@ export default {
     dialog: { type: Boolean, default: false },
     selecteddate: { type: String, default: '' },
     santris: { type: Array, default: null },
-    todaysmenu: { type: Object, default: null }
+    todaysmenu: { type: Object, default: null },
+    orderindate: { type: Array, default: null }
   },
   data () {
     return {
@@ -84,7 +103,20 @@ export default {
       userid: state => state.user.id
     }),
     santries () {
-      return cloneDeep(this.santris)
+      const clones = cloneDeep(this.santris)
+      if (this.orderindate.length > 0) {
+        for (let i = 0; i < this.orderindate.length; i++) {
+          const index = clones.findIndex(obj => obj.id === this.orderindate[i].children_id)
+          clones[index].notes = this.orderindate[i].notes
+          clones[index].order_id = this.orderindate[i].id
+        }
+      }
+      return clones
+    }
+  },
+  watch: {
+    orderindate () {
+      this.childIds = this.orderindate.length > 0 ? this.orderindate.map(obj => obj.children_id) : []
     }
   },
   methods: {
@@ -92,6 +124,9 @@ export default {
       if (this.childIds.includes(id) === false) {
         this.childIds.push(id)
       } else {
+        if (orderId) {
+          alert('Anda yakin menghapus pesanan ini?')
+        }
         this.$store.dispatch('menu/removeArray', { arr: this.childIds, search: id })
       }
     },
@@ -109,7 +144,8 @@ export default {
             parent_id: this.userid
           })
         }
-        await this.$store.dispatch('order/addOrder', arrayInput)
+        await console.log(arrayInput)
+        // await this.$store.dispatch('order/addOrder', arrayInput)
         this.$emit('closeit')
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {

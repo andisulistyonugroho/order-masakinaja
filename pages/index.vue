@@ -44,7 +44,15 @@
       :selecteddate="selectedDate"
       :santris="childrens"
       :todaysmenu="todaysMenu"
+      @closeit="closeIt"
+    />
+    <LazyDetailOrder
+      v-if="detailOrderDialog"
+      :dialog="detailOrderDialog"
+      :selecteddate="selectedDate"
+      :santris="childrens"
       :orderindate="orderInDate"
+      :todaysmenu="todaysMenu"
       @closeit="closeIt"
     />
   </section>
@@ -66,7 +74,8 @@ export default {
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
       orderDialog: false,
-      selectedDate: ''
+      selectedDate: '',
+      detailOrderDialog: false
     }
   },
   computed: {
@@ -133,12 +142,18 @@ export default {
       await this.$store.dispatch('children/getChildrens')
       await this.$store.dispatch('order/getMenuByDate', date)
       await this.$store.dispatch('order/getOrderInDate', date)
-      this.orderDialog = true
+      console.log(this.orderInDate)
+      if (this.orderInDate.length > 0) {
+        this.detailOrderDialog = true
+      } else {
+        this.orderDialog = true
+      }
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
     async closeIt () {
       await this.getEvents()
       this.orderDialog = false
+      this.detailOrderDialog = false
     }
   }
 }
