@@ -11,8 +11,11 @@
       <v-card-text class="pb-0">
         <v-form ref="form">
           <v-select
-            :items="santris"
-            label="Santri*"
+            :items="availableSantris"
+            label="Nama Santri*"
+            :rules="[v => !!v || 'Data ini tidak boleh kosong']"
+            item-text="call_name"
+            item-value="id"
           />
           <v-textarea
             v-model="notes"
@@ -47,11 +50,15 @@ export default {
   },
   data () {
     return {
-      notes: null
+      notes: null,
+      availableSantris: []
     }
   },
   created () {
     console.log('add orde created')
+    const childrenIds = this.orderindate.map(obj => obj.children_id)
+    this.availableSantris = this.santris.filter(obj => !childrenIds.includes(obj.id))
+    console.log('AVAIL:', this.availableSantris)
   },
   methods: {
     closeAddOrderD () {
