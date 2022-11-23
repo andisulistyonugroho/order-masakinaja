@@ -1,7 +1,8 @@
 export const state = () => ({
   menu: {},
   orders: [],
-  orderInDate: []
+  orderInDate: [],
+  sumOrders: []
 })
 
 export const actions = {
@@ -66,7 +67,7 @@ export const actions = {
         .select(`
           *,
           childrens(
-            call_name
+            *
           )
         `)
         .eq('order_date', date)
@@ -74,6 +75,35 @@ export const actions = {
       if (error) { throw error }
 
       commit('setOrderInDate', data)
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async countOrderInRange ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .select('id, order_date')
+        .eq('is_active', true)
+        .gte('order_date', input.start_date)
+        .lte('order_date', input.end_date)
+      if (error) { throw error }
+
+      const tmp = []
+      for (const n of data) {
+        const index = tmp.findIndex(obj => obj.order_date === n.order_date)
+        if (index >= 0) {
+          tmp[index].count += 1
+        } else {
+          tmp.push({
+            order_date: n.order_date,
+            count: 1
+          })
+        }
+      }
+      commit('setSumOrders', tmp)
 
       return Promise.resolve(data)
     } catch (error) {
@@ -104,5 +134,8 @@ export const mutations = {
   },
   setOrderInDate (state, data) {
     state.orderInDate = data
+  },
+  setSumOrders (state, data) {
+    state.sumOrders = data
   }
 }

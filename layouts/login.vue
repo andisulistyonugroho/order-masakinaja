@@ -57,7 +57,7 @@ export default {
       snackbar: { view: false, color: 'success', message: '' },
       refCode: this.$route.query.refcode,
       waitDialog: false,
-      adminphone: '0812345678910'
+      adminphone: '085759397500'
     }
   },
   created () {
@@ -84,7 +84,7 @@ export default {
   methods: {
     openWa (data) {
       const phone = data.replace('0', '62')
-      const message = 'Hai kak, Saya mau mendaftar sebagai customer Masakinaja dari web, boleh tanya-tanya dulu?'
+      const message = 'Assalamu\'alaikum admin, saya mau bertanya.'
       window.open(
         `https://api.whatsapp.com/send?phone=${phone}&text=${message}`,
         '_blank'

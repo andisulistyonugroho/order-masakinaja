@@ -14,7 +14,7 @@
       <!-- menu with child -->
       <v-list-group
         v-if="menu.child"
-        :key="menu.id"
+        :key="menu.title"
         :prepend-icon="menu.icon"
         no-action
         color="white--text"
@@ -50,7 +50,7 @@
               </v-list-item-action>
             </v-list-item>
           </v-list-group>
-          <v-list-item v-else :key="`else-${sub.id}`" :to="sub.to" nuxt router>
+          <v-list-item v-else :key="`subelse-${sub.title}`" :to="sub.to" nuxt router>
             <v-list-item-title v-text="sub.title" />
             <v-list-item-icon>
               <v-icon style="font-size: 19px;">
@@ -61,7 +61,7 @@
         </template>
       </v-list-group>
       <!-- menu without child -->
-      <v-list-item v-else :key="`else-${menu.id}`" :to="menu.to" router>
+      <v-list-item v-else :key="`menuelse-${menu.title}`" :to="menu.to" router>
         <v-list-item-action>
           <v-icon>{{ menu.icon }}</v-icon>
         </v-list-item-action>
@@ -82,14 +82,14 @@ export default {
     ...mapState({
       menus: state => state.menu.all,
       userId: state => state.user.id,
-      role: state => state.user.role
+      role: state => state.user.profile.full_name
     })
   },
   created () {
     if (this.role) {
       this.$store.dispatch('menu/getMenuForMe', {
         userId: this.userId,
-        roleName: this.role[0].name
+        roleName: this.role
       })
     }
   }

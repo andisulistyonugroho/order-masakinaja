@@ -27,12 +27,6 @@
           </v-btn>
         </template>
         <v-list dense class="text-uppercase">
-          <v-list-item @click="changePasswordDialog = true">
-            <v-list-item-title>ganti password</v-list-item-title>
-          </v-list-item>
-          <v-list-item to="/profile">
-            <v-list-item-title>profil</v-list-item-title>
-          </v-list-item>
           <v-list-item @click="manageChildrenDialog = true">
             <v-list-item-title>data santri</v-list-item-title>
           </v-list-item>
@@ -96,11 +90,14 @@ export default {
   computed: {
     ...mapState({
       userId: state => state.user.id,
-      user: state => (state.user.profile ? state.user.profile.fullname : null),
+      user: state => state.user,
       profile: state => state.user.profile
     })
   },
   created () {
+    this.$nuxt.$on('ONBOARDING_ADD_CHILD', () => {
+      this.manageChildrenDialog = true
+    })
     this.$nuxt.$on('ONBOARDING_CHANGE_PASSWD', () => {
       this.changePasswordDialog = true
     })
@@ -125,6 +122,8 @@ export default {
   beforeDestroy () {
     this.$nuxt.$off('EAT_SNACKBAR')
     this.$nuxt.$off('WAIT_DIALOG')
+    this.$nuxt.$off('ONBOARDING_CHANGE_PASSWD')
+    this.$nuxt.$off('ONBOARDING_ADD_CHILD')
   },
   methods: {
     doLogout () {
@@ -144,8 +143,12 @@ export default {
         await this.$store.dispatch('user/getMyProfile', this.userId)
       }
     },
-    closeItChildren () {
+    async closeItChildren () {
       this.manageChildrenDialog = false
+      if (!this.profile.updated_at) {
+        await this.$supabase.from('profiles').update({ updated_at: new Date() }).match({ id: this.userId })
+        await this.$store.dispatch('user/getMyProfile', this.userId)
+      }
     }
   }
 }

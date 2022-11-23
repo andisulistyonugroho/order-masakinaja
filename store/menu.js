@@ -1,6 +1,6 @@
 export const state = () => ({
   all: [
-    { icon: 'mdi-home', title: 'Home', to: '/', roles: ['ba'] }
+    { icon: 'mdi-home', title: 'Home', to: '/' }
   ],
   beforeLogin: null
 })
@@ -10,19 +10,24 @@ export const actions = {
     commit('setBeforeLogin', data)
   },
   getMenuForMe ({ commit, rootState }) {
-    const roleName = rootState.user.role[0].name
+    const roleName = rootState.user.profile.full_name
 
     const menu = [
-      { icon: 'mdi-home', title: 'Home', to: '/', roles: ['customer'] },
+      { icon: 'mdi-home', title: 'Home', to: '/', roles: ['superadmin'] },
       {
         icon: 'mdi-basket-outline',
-        title: 'Transaksi',
+        title: 'Pesanan',
+        to: '/orders',
+        roles: ['superadmin']
+      },
+      {
+        icon: 'mdi-food-turkey',
+        title: 'Masakan',
         to: '/',
-        roles: ['customer'],
+        roles: ['superadmin'],
         child: [
-          { icon: '', title: 'Belum Dibayar', to: '/transaction/unpaid', roles: ['customer'] },
-          { icon: '', title: 'Dalam Proses', to: '/transaction/inprocess', roles: ['customer'] },
-          { icon: '', title: 'Semua Transaksi', to: '/transaction/all', roles: ['customer'] }
+          { icon: '', title: 'Menu Dasar', to: '/cooking/basic', roles: ['superadmin'] },
+          { icon: '', title: 'Menu Harian', to: '/cooking/daily', roles: ['superadmin'] }
         ]
       }
     ]
