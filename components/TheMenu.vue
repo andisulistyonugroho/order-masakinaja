@@ -82,7 +82,7 @@ export default {
     ...mapState({
       menus: state => state.menu.all,
       userId: state => state.user.id,
-      role: state => state.user.profile.full_name
+      role: state => state.user.profile.acl_role
     })
   },
   created () {

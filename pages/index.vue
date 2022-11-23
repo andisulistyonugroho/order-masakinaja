@@ -1,5 +1,5 @@
 <template>
-  <CalendarIndex v-if="profile.full_name !== 'superadmin'" />
+  <CalendarIndex v-if="profile.acl_role !== 'superadmin'" />
 </template>
 <script>
 import { mapState } from 'vuex'

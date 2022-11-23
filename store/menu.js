@@ -10,10 +10,12 @@ export const actions = {
     commit('setBeforeLogin', data)
   },
   getMenuForMe ({ commit, rootState }) {
-    const roleName = rootState.user.profile.full_name
+    const roleName = rootState.user.profile.acl_role
+    console.log('getmenu for me:', roleName)
 
     const menu = [
-      { icon: 'mdi-home', title: 'Home', to: '/', roles: ['superadmin'] },
+      { icon: 'mdi-home', title: 'Home', to: '/', roles: ['superadmin', 'member'] },
+      { icon: 'mdi-basket-outline', title: 'Pesanan', to: '/', roles: ['member'] },
       {
         icon: 'mdi-basket-outline',
         title: 'Pesanan',
