@@ -1,5 +1,6 @@
 export const state = () => ({
-  all: []
+  all: [],
+  menuInRange: []
 })
 
 export const actions = {
@@ -30,6 +31,57 @@ export const actions = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  async getMenuInRange ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('daily_menu')
+        .select(`
+          *,
+          cooked_menus(
+            *
+          )
+        `)
+        .gte('menu_date', input.start_date)
+        .lte('menu_date', input.end_date)
+      if (error) { throw error }
+
+      commit('setMenuInRange', data)
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async updateDailyMenu ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('daily_menu')
+        .update({
+          cooked_menu_id: input.cooked_menu_id
+        })
+        .eq('id', input.id)
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async addDailyMenu ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('daily_menu')
+        .insert([{
+          menu_date: input.menu_date,
+          cooked_menu_id: input.cooked_menu_id
+        }])
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 
@@ -41,5 +93,8 @@ export const mutations = {
     const current = state.all
     current.push(data[0])
     state.all = current
+  },
+  setMenuInRange (state, data) {
+    state.menuInRange = data
   }
 }
