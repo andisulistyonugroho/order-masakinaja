@@ -103,12 +103,12 @@ export default {
     }
   },
   methods: {
-    async getEvents () {
+    async getEvents ({ start, end }) {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
         await this.$store.dispatch('order/getOrderInRange', {
-          start_date: dayjs().startOf('month').utc(),
-          end_date: dayjs().endOf('month').utc()
+          start_date: dayjs(start.date).startOf('month').utc(),
+          end_date: dayjs(end.date).endOf('month').utc()
         })
         const events = this.orders.map((obj) => {
           return {
