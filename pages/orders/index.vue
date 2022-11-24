@@ -89,8 +89,8 @@ export default {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
         await this.$store.dispatch('order/countOrderInRange', {
-          start_date: dayjs(start).startOf('month').utc(),
-          end_date: dayjs(end).endOf('month').utc()
+          start_date: dayjs(start.date).startOf('month').utc(),
+          end_date: dayjs(end.date).endOf('month').utc()
         })
         const events = this.sumOrders.map((obj) => {
           return {
