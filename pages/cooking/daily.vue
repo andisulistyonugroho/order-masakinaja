@@ -62,7 +62,8 @@ export default {
       weekday: [1, 2, 3, 4],
       events: [],
       cookingDialog: false,
-      selectedDate: ''
+      selectedDate: '',
+      calendarDate: { start: null, end: null }
     }
   },
   computed: {
@@ -96,6 +97,7 @@ export default {
           }
         })
         this.events = events
+        this.calendarDate = { start, end }
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)
@@ -106,7 +108,7 @@ export default {
         })
       }
     },
-    openCookingDialog: debounce(async function ({ date, past, present }) {
+    openCookingDialog: debounce(async function ({ date }) {
       this.$nuxt.$emit('WAIT_DIALOG', true)
       await this.$store.dispatch('order/getMenuByDate', date)
       await this.$store.dispatch('cooking/getAll')
@@ -116,7 +118,7 @@ export default {
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
     async closeIt () {
-      await this.getEvents()
+      await this.getEvents(this.calendarDate)
       this.cookingDialog = false
     }
   }

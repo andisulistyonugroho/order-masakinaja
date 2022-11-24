@@ -76,7 +76,8 @@ export default {
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
       orderDialog: false,
       selectedDate: '',
-      detailOrderDialog: false
+      detailOrderDialog: false,
+      calendarDate: { start: null, end: null }
     }
   },
   computed: {
@@ -120,6 +121,7 @@ export default {
           }
         })
         this.events = events
+        this.calendarDate = { start, end }
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)
@@ -160,7 +162,7 @@ export default {
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
     async closeIt () {
-      await this.getEvents()
+      await this.getEvents(this.calendarDate)
       this.orderDialog = false
       this.detailOrderDialog = false
     },

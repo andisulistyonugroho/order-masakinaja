@@ -68,7 +68,8 @@ export default {
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
       orderDialog: false,
       selectedDate: '',
-      detailOrderDialog: false
+      detailOrderDialog: false,
+      calendarDate: { start: null, end: null }
     }
   },
   computed: {
@@ -84,12 +85,12 @@ export default {
     this.$nuxt.$emit('TITLE_BAR', 'Pemesanan Katering')
   },
   methods: {
-    async getEvents () {
+    async getEvents ({ start, end }) {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
         await this.$store.dispatch('order/countOrderInRange', {
-          start_date: dayjs().startOf('month').utc(),
-          end_date: dayjs().endOf('month').utc()
+          start_date: dayjs(start).startOf('month').utc(),
+          end_date: dayjs(end).endOf('month').utc()
         })
         const events = this.sumOrders.map((obj) => {
           return {
@@ -101,6 +102,7 @@ export default {
           }
         })
         this.events = events
+        this.calendarDate = { start, end }
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)
@@ -133,7 +135,7 @@ export default {
       this.$nuxt.$emit('WAIT_DIALOG', false)
     }, 1000, { leading: true, trailing: false }),
     async closeIt () {
-      await this.getEvents()
+      await this.getEvents(this.calendarDate)
       this.orderDialog = false
       this.detailOrderDialog = false
     },
