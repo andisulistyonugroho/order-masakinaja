@@ -91,14 +91,6 @@
                   </nuxt-link>
                 </div>
               </v-card-text>
-              <v-card-text class="greylight">
-                <div class="text-center">
-                  Sudah daftar tapi belum bisa login?
-                  <nuxt-link to="/verification">
-                    verifikasi di sini
-                  </nuxt-link>
-                </div>
-              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
