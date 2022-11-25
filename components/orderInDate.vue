@@ -104,7 +104,7 @@ export default {
           arrayInput.push({
             children_id: this.childIds[i],
             order_date: this.selecteddate,
-            cooked_menus_id: this.cookedmenusid,
+            cooked_menus_id: this.todaysmenu.id,
             notes: santri.notes,
             parent_id: this.userid
           })

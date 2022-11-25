@@ -2,7 +2,8 @@ export const state = () => ({
   menu: {},
   orders: [],
   orderInDate: [],
-  sumOrders: []
+  sumOrders: [],
+  invoices: []
 })
 
 export const actions = {
@@ -122,6 +123,28 @@ export const actions = {
     } catch (error) {
       return Promise.reject(error)
     }
+  },
+  async getOrderByStatus ({ commit }, input) {
+    try {
+      let query = this.$supabase
+        .from('orders')
+        .select('*,childrens(*),cooked_menus(name)')
+
+      if (input.status === 'paid') {
+        query = query.in('status', [2, 3])
+      } else if (input.status === 'unpaid') {
+        query = query.eq('status', 1)
+          .eq('is_active', true)
+      }
+      const { data, error } = await query
+      if (error) { throw error }
+
+      commit('setInvoices', data)
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 
@@ -137,5 +160,8 @@ export const mutations = {
   },
   setSumOrders (state, data) {
     state.sumOrders = data
+  },
+  setInvoices (state, data) {
+    state.invoices = data
   }
 }

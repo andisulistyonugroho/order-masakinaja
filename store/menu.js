@@ -15,7 +15,7 @@ export const actions = {
 
     const menu = [
       { icon: 'mdi-home', title: 'Home', to: '/', roles: ['superadmin', 'member'] },
-      { icon: 'mdi-basket-outline', title: 'Pesanan', to: '/', roles: ['member'] },
+      { icon: 'mdi-basket-outline', title: 'Tagihan', to: '/invoice', roles: ['member'] },
       {
         icon: 'mdi-basket-outline',
         title: 'Pesanan',

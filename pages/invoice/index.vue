@@ -1,5 +1,5 @@
 <template>
-  <LazyCalendarIndex v-if="profile.acl_role !== 'superadmin'" />
+  <LazyInvoiceIndex v-if="profile.acl_role === 'member'" />
 </template>
 <script>
 import { mapState } from 'vuex'
