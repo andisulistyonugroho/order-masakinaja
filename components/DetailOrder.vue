@@ -29,7 +29,7 @@
           <div>
             {{ order.notes }}
           </div>
-          <div class="d-flex pt-2">
+          <div v-if="isAllowed" class="d-flex pt-2">
             <v-spacer />
             <v-btn
               color="primary"
@@ -60,6 +60,7 @@
       </v-card-text>
     </v-card>
     <LazyOrderDetailEditNotes
+      v-if="editNoteD"
       :dialog="editNoteD"
       :orderdetail="editedOrderDetail"
       @closeit="closeEditNoteD"
@@ -116,10 +117,12 @@ export default {
       return this.editedOrderId ? this.orderindate.find(obj => obj.id === this.editedOrderId).childrens.call_name : ''
     },
     canAddNewOrder () {
+      return this.isAllowed && this.santries.length > this.orderindate.length
+    },
+    isAllowed () {
       const lastchance = this.$dayjs(this.selecteddate).startOf('date').add(7, 'hour')
       const thistime = this.$dayjs()
-
-      return thistime.isBefore(lastchance) && this.santries.length > this.orderindate.length
+      return thistime.isBefore(lastchance)
     }
   },
   watch: {
