@@ -7,6 +7,9 @@
       class=""
     >
       <TheMenu />
+      <div class="text-center caption">
+        v{{ version }}
+      </div>
     </v-navigation-drawer>
     <v-app-bar color="#ffffff" fixed app flat>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
@@ -84,7 +87,8 @@ export default {
       snackbar: { view: false, color: 'success', message: '' },
       icons: [],
       changePasswordDialog: false,
-      manageChildrenDialog: false
+      manageChildrenDialog: false,
+      version: process.env.version
     }
   },
   computed: {

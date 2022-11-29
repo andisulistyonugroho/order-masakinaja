@@ -2,6 +2,7 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   env: {
+    version: '1.0',
     storage: 'attachments',
     container: 'masakinaja',
     cdn: 'https://masakinaja.sgp1.cdn.digitaloceanspaces.com'
