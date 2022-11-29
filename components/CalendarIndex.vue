@@ -3,22 +3,22 @@
     <v-sheet class="d-flex">
       <v-toolbar dense flat>
         <v-btn
-          icon
-          class="ma-2"
+          fab
+          text
+          small
           @click="$refs.calendar.prev()"
         >
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-
+        <v-spacer />
         <v-toolbar-title v-if="$refs.calendar">
           {{ $refs.calendar.title }}
         </v-toolbar-title>
-
         <v-spacer />
-
         <v-btn
-          icon
-          class="ma-2"
+          small
+          fab
+          text
           @click="$refs.calendar.next()"
         >
           <v-icon>mdi-chevron-right</v-icon>
