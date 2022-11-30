@@ -1,61 +1,132 @@
 <template>
   <section :class="$vuetify.breakpoint.mobile ? 'pt-0' : 'pa-3'">
-    <v-tabs v-model="tab">
-      <v-tab>
-        belum lunas
-      </v-tab>
-      <v-tab>
-        lunas
-      </v-tab>
-    </v-tabs>
-    <v-sheet class="px-4 pt-5 text-center">
-      TOTAL: {{ totalBill|toMoney }}
+    <v-select
+      v-model="tab"
+      :items="items"
+      label="Status"
+      class="px-3"
+    />
+    <v-sheet class="px-4 text-right caption d-flex font-weight-bold">
+      TOTAL: {{ totalBill|toMoney }}<br>
+      SISA: {{ totalLeft|toMoney }}
+      <v-spacer />
+      <span class="primary--text">BAYAR: {{ totalPaid|toMoney }}</span>
     </v-sheet>
     <v-list two-line>
-      <v-list-item-group v-model="orderIds" multiple active-class="primary--text">
-        <v-list-item v-for="row in invoices" :key="row.id">
-          <template #default="{active}">
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ row.childrens.call_name }}
-              </v-list-item-title>
-              <v-list-item-subtitle>{{ row.order_date|toDayDate }}</v-list-item-subtitle>
-              <v-list-item-subtitle>{{ row.cooked_menus ? row.cooked_menus.name : '' }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-list-item-action-text class="primary--text">
-                Rp12.500
-              </v-list-item-action-text>
-              <v-icon :color="active ? 'yellow darken-3' : 'grey lighten-1'">
-                {{ active ? 'mdi-basket-check' : 'mdi-basket' }}
-              </v-icon>
-            </v-list-item-action>
-          </template>
+      <v-list-item-group id="invoices-unpaid">
+        <v-list-item v-for="payment in unPaid" :key="payment.id">
+          <v-list-item-content>
+            <v-list-item-title>
+              <span class="text-uppercase">inv-masakinaja.{{ payment.id }}</span>
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ payment.created_at|toDayDate }}</v-list-item-subtitle>
+            <v-list-item-subtitle>Pembayaran {{ payment.orders.length }} paket katering</v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-list-item-action-text class="primary--text">
+              Rp{{ payment.amount|toMoney }}
+            </v-list-item-action-text>
+          </v-list-item-action>
         </v-list-item>
+      </v-list-item-group>
+
+      <v-list-item-group v-model="orderIds" multiple active-class="primary--text">
+        <template v-if="tab === 1">
+          <v-list-item v-for="row in unInvoiced" :key="row.id" @click="selectingOrder(row)">
+            <template #default="{active}">
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ row.childrens.call_name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ row.order_date|toDayDate }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ row.cooked_menus ? row.cooked_menus.name : '' }}</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-list-item-action-text class="primary--text">
+                  Rp12.500
+                </v-list-item-action-text>
+                <v-icon :color="active ? 'green darken-1' : 'grey lighten-1'">
+                  {{ active ? 'mdi-basket-check' : 'mdi-basket' }}
+                </v-icon>
+              </v-list-item-action>
+            </template>
+          </v-list-item>
+        </template>
+        <template v-else>
+          <v-list-item v-for="row in invoices" :key="row.id" @click="selectingOrder(row)">
+            <template #default="{active}">
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ row.childrens.call_name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ row.order_date|toDayDate }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ row.cooked_menus ? row.cooked_menus.name : '' }}</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-list-item-action-text class="primary--text">
+                  Rp12.500
+                </v-list-item-action-text>
+                <v-icon :color="active ? 'green darken-1' : 'grey lighten-1'">
+                  {{ active ? 'mdi-basket-check' : 'mdi-basket' }}
+                </v-icon>
+              </v-list-item-action>
+            </template>
+          </v-list-item>
+        </template>
       </v-list-item-group>
     </v-list>
     <v-btn
+      v-if="totalPaid > 0"
       color="primary"
       rounded
       fixed
       right
       bottom
       style="right:10vw;"
+      @click="confirmInvoiceGeneratingDialog = true"
     >
       <v-icon left>
         mdi-check
       </v-icon>
       bayar
     </v-btn>
+    <v-dialog
+      v-model="confirmInvoiceGeneratingDialog"
+      persistent
+      scrollable
+    >
+      <v-sheet class="pa-3">
+        Anda akan melakukan pembayaran untuk {{ selectedOrder.length }} paket katering  sebesar <span class="primary--text font-weight-bold">Rp{{ totalPaid|toMoney }}</span><br>
+        <span class="caption">mau lanjut ke pembayaran?</span>
+        <div class="d-flex pt-2">
+          <v-spacer />
+          <v-btn color="primary" text rounded class="mr-2" @click="confirmInvoiceGeneratingDialog = false">
+            tidak
+          </v-btn>
+          <v-btn color="primary" rounded depressed @click="createPayment()">
+            ya
+          </v-btn>
+        </div>
+      </v-sheet>
+    </v-dialog>
   </section>
 </template>
 <script>
 import { mapState } from 'vuex'
+import debounce from 'lodash.debounce'
 export default {
   data () {
     return {
-      tab: 0,
-      orderIds: []
+      tab: 1,
+      orderIds: [],
+      items: [
+        { value: 1, text: 'Belum Lunas' },
+        { value: 3, text: 'Sedang dicek' },
+        { value: 4, text: 'Lunas' },
+        { value: 5, text: 'Refund' }
+      ],
+      selectedOrder: [],
+      confirmInvoiceGeneratingDialog: false
     }
   },
   computed: {
@@ -66,6 +137,43 @@ export default {
     }),
     totalBill () {
       return 12500 * this.invoices.length
+    },
+    totalPaid () {
+      return 12500 * this.selectedOrder.length
+    },
+    totalLeft () {
+      return this.totalBill - this.totalPaid
+    },
+    unPaid () {
+      if (this.tab === 1) {
+        const unpaid = []
+        for (const row of this.invoices) {
+          const index = unpaid.findIndex(obj => obj.id === row.payment_id)
+          if (index >= 0) {
+            unpaid[index].orders.push(row)
+          } else if (row.payments) {
+            const l = row.payments
+            l.orders = [row]
+            unpaid.push(l)
+          }
+        }
+        return unpaid
+      } else {
+        return []
+      }
+    },
+    unInvoiced () {
+      if (this.tab === 1) {
+        const unpaid = []
+        for (const row of this.invoices) {
+          if (!row.payments) {
+            unpaid.push(row)
+          }
+        }
+        return unpaid
+      } else {
+        return []
+      }
     }
   },
   watch: {
@@ -78,9 +186,8 @@ export default {
     await this.getOrderDataByStatus(this.tab)
   },
   methods: {
-    async getOrderDataByStatus (tabindex) {
+    async getOrderDataByStatus (state) {
       try {
-        const state = tabindex === 1 ? 'paid' : 'unpaid'
         this.$nuxt.$emit('WAIT_DIALOG', true)
         await this.$store.dispatch('order/getOrderByStatus', { status: state })
         this.$nuxt.$emit('WAIT_DIALOG', false)
@@ -92,7 +199,38 @@ export default {
           message: error
         })
       }
-    }
+    },
+    selectingOrder (data) {
+      if (!this.selectedOrder.includes(data.id)) {
+        this.selectedOrder.push(data.id)
+      } else {
+        this.$store.dispatch('menu/removeArray', { arr: this.selectedOrder, search: data.id })
+      }
+    },
+    createPayment: debounce(async function () {
+      try {
+        this.$nuxt.$emit('WAIT_DIALOG', true)
+        const order2Pay = {
+          list_order_id: this.selectedOrder,
+          amount: this.totalPaid,
+          profile_id: this.userId
+        }
+        const payment = await this.$store.dispatch('payment/createPayment', order2Pay)
+        await this.$store.dispatch('order/setOrderPaymentId', {
+          selected_order_id: this.selectedOrder,
+          payment_id: payment.id
+        })
+        this.confirmInvoiceGeneratingDialog = false
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+      } catch (error) {
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
+        })
+      }
+    })
   }
 }
 </script>

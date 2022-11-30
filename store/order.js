@@ -126,20 +126,33 @@ export const actions = {
   },
   async getOrderByStatus ({ commit }, input) {
     try {
-      let query = this.$supabase
+      const query = this.$supabase
         .from('orders')
-        .select('*,childrens(*),cooked_menus(name)')
+        .select('*,childrens(*),cooked_menus(name),payments(*,profiles(*))')
+        .eq('status', input.status)
+        .eq('is_active', true)
 
-      if (input.status === 'paid') {
-        query = query.in('status', [2, 3])
-      } else if (input.status === 'unpaid') {
-        query = query.eq('status', 1)
-          .eq('is_active', true)
-      }
+      // if (input.status === 1) {
+      //   query = query.is('payment_id', null)
+      // }
+
       const { data, error } = await query
       if (error) { throw error }
 
       commit('setInvoices', data)
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async setOrderPaymentId ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .update({ payment_id: input.payment_id })
+        .in('id', input.selected_order_id)
+      if (error) { throw error }
 
       return Promise.resolve(data)
     } catch (error) {
