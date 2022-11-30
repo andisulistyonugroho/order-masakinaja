@@ -124,7 +124,7 @@ export const actions = {
       const { user, session, error } = await this.$supabase.auth.signUp(
         {
           email: payload.email,
-          password: payload.password
+          password: '12345678'
         },
         {
           data: {
