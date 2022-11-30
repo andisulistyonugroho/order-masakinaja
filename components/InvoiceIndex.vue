@@ -6,12 +6,19 @@
       label="Status"
       class="px-3"
     />
-    <v-sheet class="px-4 text-right caption d-flex font-weight-bold">
-      TOTAL: {{ totalBill|toMoney }}<br>
-      SISA: {{ totalLeft|toMoney }}
-      <v-spacer />
-      <span class="primary--text">BAYAR: {{ totalPaid|toMoney }}</span>
-    </v-sheet>
+    <v-row v-show="(tab === 1)" class=" px-4">
+      <v-col cols="6">
+        <div class="font-weight-bold caption">
+          TOTAL: {{ totalBill|toMoney }}<br>
+          SISA: {{ totalLeft|toMoney }}
+        </div>
+      </v-col>
+      <v-col cols="6">
+        <div class="font-weight-bold primary--text caption text-right">
+          BAYAR: {{ totalPaid|toMoney }}
+        </div>
+      </v-col>
+    </v-row>
     <v-list two-line>
       <v-list-item-group id="invoices-unpaid">
         <v-list-item v-for="payment in unPaid" :key="payment.id" @click="viewInvoice(payment)">
@@ -79,7 +86,7 @@
       v-if="totalPaid > 0"
       color="primary"
       rounded
-      fixed
+      absolute
       right
       bottom
       style="right:10vw;"
@@ -90,7 +97,7 @@
       </v-icon>
       bayar
     </v-btn>
-    <LazyInvoiceDetail v-if="invoiceDialog" :dialog="invoiceDialog" />
+    <LazyInvoiceDetail v-if="invoiceDialog" :dialog="invoiceDialog" @closeit="closeIt" />
     <v-dialog
       v-model="confirmInvoiceGeneratingDialog"
       persistent
@@ -234,12 +241,10 @@ export default {
       }
     }),
     viewInvoice (payment) {
-      this.$nuxt.$emit('EAT_SNACKBAR', {
-        view: true,
-        color: 'success',
-        message: 'error'
-      })
-      // this.invoiceDialog = true
+      this.invoiceDialog = true
+    },
+    closeIt () {
+      this.invoiceDialog = false
     }
   }
 }
