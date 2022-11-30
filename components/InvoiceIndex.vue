@@ -14,7 +14,7 @@
     </v-sheet>
     <v-list two-line>
       <v-list-item-group id="invoices-unpaid">
-        <v-list-item v-for="payment in unPaid" :key="payment.id">
+        <v-list-item v-for="payment in unPaid" :key="payment.id" @click="viewInvoice(payment)">
           <v-list-item-content>
             <v-list-item-title>
               <span class="text-uppercase">inv-masakinaja.{{ payment.id }}</span>
@@ -90,6 +90,7 @@
       </v-icon>
       bayar
     </v-btn>
+    <LazyInvoiceDetail v-if="invoiceDialog" :dialog="invoiceDialog" />
     <v-dialog
       v-model="confirmInvoiceGeneratingDialog"
       persistent
@@ -126,7 +127,8 @@ export default {
         { value: 5, text: 'Refund' }
       ],
       selectedOrder: [],
-      confirmInvoiceGeneratingDialog: false
+      confirmInvoiceGeneratingDialog: false,
+      invoiceDialog: false
     }
   },
   computed: {
@@ -230,7 +232,15 @@ export default {
           message: error
         })
       }
-    })
+    }),
+    viewInvoice (payment) {
+      this.$nuxt.$emit('EAT_SNACKBAR', {
+        view: true,
+        color: 'success',
+        message: 'error'
+      })
+      // this.invoiceDialog = true
+    }
   }
 }
 </script>
