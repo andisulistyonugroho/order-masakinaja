@@ -6,7 +6,7 @@
       label="Status"
       class="px-3"
     />
-    <v-row v-show="(tab === 1)" class=" px-4">
+    <v-row v-show="(tab === 1)" class="px-4">
       <v-col cols="6">
         <div class="font-weight-bold caption">
           TOTAL: {{ totalBill|toMoney }}<br>
@@ -97,7 +97,12 @@
       </v-icon>
       bayar
     </v-btn>
-    <LazyInvoiceDetail v-if="invoiceDialog" :dialog="invoiceDialog" @closeit="closeIt" />
+    <LazyInvoiceDetail
+      v-if="invoiceDialog"
+      :dialog="invoiceDialog"
+      :data="selectedPayment"
+      @closeit="closeIt"
+    />
     <v-dialog
       v-model="confirmInvoiceGeneratingDialog"
       persistent
@@ -135,7 +140,8 @@ export default {
       ],
       selectedOrder: [],
       confirmInvoiceGeneratingDialog: false,
-      invoiceDialog: false
+      invoiceDialog: false,
+      selectedPayment: null
     }
   },
   computed: {
@@ -227,10 +233,14 @@ export default {
         const payment = await this.$store.dispatch('payment/createPayment', order2Pay)
         await this.$store.dispatch('order/setOrderPaymentId', {
           selected_order_id: this.selectedOrder,
-          payment_id: payment.id
+          payment_id: payment[0].id
         })
+        const invoicepayment = payment[0]
+        invoicepayment.orders = this.invoices.filter(obj => this.selectedOrder.includes(obj.id))
         this.confirmInvoiceGeneratingDialog = false
         this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.viewInvoice(invoicepayment)
+        await this.getOrderDataByStatus(this.tab)
       } catch (error) {
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$nuxt.$emit('EAT_SNACKBAR', {
@@ -238,10 +248,12 @@ export default {
           color: 'error',
           message: error
         })
+        this.confirmInvoiceGeneratingDialog = false
       }
     }),
     viewInvoice (payment) {
       this.invoiceDialog = true
+      this.selectedPayment = payment
     },
     closeIt () {
       this.invoiceDialog = false

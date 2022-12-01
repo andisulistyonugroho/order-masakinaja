@@ -19,7 +19,7 @@
           <v-row class="px-3">
             <v-col cols="6" class="text-uppercase font-weight-bold">
               <v-chip color="white" class="px-0">
-                inv-masakinaja-1
+                inv-masakinaja-{{ data.id }}
               </v-chip>
             </v-col>
             <v-col cols="6" class="text-right">
@@ -28,10 +28,10 @@
               </v-chip>
             </v-col>
             <v-col cols="6">
-              Transfer sebelum
+              Katering santri
             </v-col>
             <v-col cols="6" class="text-right">
-              29 Nop 2022 23:00
+              {{ data.orders.length }} paket
             </v-col>
             <v-col cols="12">
               <v-divider />
@@ -43,7 +43,7 @@
               Harga
             </v-col>
             <v-col cols="6" class="text-right font-weight-bold">
-              Rp100.000
+              Rp{{ data.amount | toMoney }}
             </v-col>
             <v-col cols="6" class="font-weight-bold black--text">
               Kode Unik
@@ -57,55 +57,58 @@
               <v-img src="/logo-bsi@30.png" max-width="35" class="white" />
             </v-col>
             <v-col cols="10" class="pl-0 my-1 font-weight-bold">
-              Eka Aulia
+              BSI an. Eka Aulia
             </v-col>
             <v-col cols="12" class="py-0">
               <v-text-field
-                value="23424240984204"
+                value="7141894425"
                 readonly
                 solo
                 flat
                 background-color="white"
                 append-icon="mdi-content-copy"
-                @click:append="copy2Clipboard('123')"
+                @click:append="copy2Clipboard('7141894425')"
               />
             </v-col>
             <v-col cols="12" class="py-0">
               <span class="black--text">Total Pembayaran</span>
               <v-text-field
                 prefix="Rp"
-                value="100000"
+                :value="(data.amount+20)|toMoney"
                 readonly
                 solo
                 flat
                 background-color="white"
                 append-icon="mdi-content-copy"
-                @click:append="copy2Clipboard('456')"
+                @click:append="copy2Clipboard(data.amount+20)"
               />
             </v-col>
           </v-row>
         </v-container>
-      </v-card-text>
-      <v-footer color="white">
-        <v-btn block text color="primary" class="mb-10 text-capitalize" rounded>
+        <v-btn
+          block
+          text
+          depressed
+          color="primary"
+          class="mt-6 text-capitalize"
+          rounded
+        >
           batalkan transaksi
         </v-btn>
-        <v-btn block depressed color="primary" x-large>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn block depressed color="primary" x-large rounded>
           Saya sudah transfer
         </v-btn>
-      </v-footer>
-      <!-- <v-card-actions>
-        <v-btn block depressed color="primary" x-large>
-          Saya sudah transfer
-        </v-btn>
-      </v-card-actions> -->
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script>
 export default {
   props: {
-    dialog: { type: Boolean, default: false }
+    dialog: { type: Boolean, default: false },
+    data: { type: Object, default: null }
   },
   methods: {
     async copy2Clipboard (value) {
@@ -113,7 +116,7 @@ export default {
       this.$nuxt.$emit('EAT_SNACKBAR', {
         view: true,
         color: 'success',
-        message: 'Berhasil di copy'
+        message: 'Berhasil di salin'
       })
     }
   }
