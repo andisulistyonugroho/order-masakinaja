@@ -86,10 +86,10 @@
       v-if="totalPaid > 0"
       color="primary"
       rounded
-      absolute
+      fixed
       right
       bottom
-      style="right:10vw;"
+      style="right:10vw;bottom:10vmax;"
       @click="confirmInvoiceGeneratingDialog = true"
     >
       <v-icon left>
@@ -102,6 +102,7 @@
       :dialog="invoiceDialog"
       :data="selectedPayment"
       @closeit="closeIt"
+      @ihavetransfered="iHaveTransfered"
     />
     <v-dialog
       v-model="confirmInvoiceGeneratingDialog"
@@ -122,6 +123,12 @@
         </div>
       </v-sheet>
     </v-dialog>
+    <LazyInvoiceStatus
+      v-if="invoiceStatusDialog"
+      :dialog="invoiceStatusDialog"
+      :data="selectedPayment"
+      @closeit="closeInvoiceStatus"
+    />
   </section>
 </template>
 <script>
@@ -141,7 +148,8 @@ export default {
       selectedOrder: [],
       confirmInvoiceGeneratingDialog: false,
       invoiceDialog: false,
-      selectedPayment: null
+      selectedPayment: null,
+      invoiceStatusDialog: false
     }
   },
   computed: {
@@ -204,6 +212,7 @@ export default {
     async getOrderDataByStatus (state) {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
+        this.selectedOrder = []
         await this.$store.dispatch('order/getOrderByStatus', { status: state })
         this.$nuxt.$emit('WAIT_DIALOG', false)
       } catch (error) {
@@ -252,11 +261,21 @@ export default {
       }
     }),
     viewInvoice (payment) {
+      this.orderIds = []
       this.invoiceDialog = true
       this.selectedPayment = payment
     },
-    closeIt () {
+    async closeIt () {
       this.invoiceDialog = false
+      await this.getOrderDataByStatus(this.tab)
+    },
+    iHaveTransfered () {
+      this.invoiceStatusDialog = true
+      this.closeIt()
+    },
+    async closeInvoiceStatus () {
+      this.invoiceStatusDialog = false
+      await this.getOrderDataByStatus(this.tab)
     }
   }
 }

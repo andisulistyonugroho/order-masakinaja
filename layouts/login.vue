@@ -57,7 +57,7 @@ export default {
       snackbar: { view: false, color: 'success', message: '' },
       refCode: this.$route.query.refcode,
       waitDialog: false,
-      adminphone: '085759397500'
+      adminphone: process.env.ADMINPHONE
     }
   },
   created () {

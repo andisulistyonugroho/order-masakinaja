@@ -1,3 +1,8 @@
 .bg-body {
   background-color: #f6f9fc;
 }
+@media only screen and (max-width: 959px) {
+  .v-stepper:not(.v-stepper--vertical) .v-stepper__label {
+    display: flex !important;
+  }
+}

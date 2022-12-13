@@ -92,12 +92,20 @@
           color="primary"
           class="mt-6 text-capitalize"
           rounded
+          @click="doCancel"
         >
           batalkan transaksi
         </v-btn>
       </v-card-text>
       <v-card-actions>
-        <v-btn block depressed color="primary" x-large rounded>
+        <v-btn
+          block
+          depressed
+          color="primary"
+          x-large
+          rounded
+          @click="iHaveTransfered()"
+        >
           Saya sudah transfer
         </v-btn>
       </v-card-actions>
@@ -105,6 +113,7 @@
   </v-dialog>
 </template>
 <script>
+import debounce from 'lodash.debounce'
 export default {
   props: {
     dialog: { type: Boolean, default: false },
@@ -118,7 +127,55 @@ export default {
         color: 'success',
         message: 'Berhasil di salin'
       })
-    }
+    },
+    doCancel: debounce(async function () {
+      try {
+        this.$nuxt.$emit('WAIT_DIALOG', true)
+        await this.$store.dispatch('payment/cancelPayment', this.data.id)
+        await this.$store.dispatch('order/removeOrderPaymentByPaymentId', this.data.id)
+
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'success',
+          message: 'Transaksi berhasil di batalkan'
+        })
+        this.$emit('closeit')
+      } catch (error) {
+        // supabase js library has no transaction support for now
+        // if the canceling process failed
+        // update paymentstatus back to unpaid
+        // update order payment_id back to paymentId
+        await this.$store.dispatch('payment/updatePaymentStatus', { paymentId: this.data.id, status: 1 })
+
+        const selectedOrderId = this.data.orders.map(obj => obj.id)
+        await this.$store.dispatch('order/setOrderPaymentId', {
+          payment_id: this.data.id,
+          selected_order_id: selectedOrderId
+        })
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
+        })
+      }
+    }, 1000, { leading: true, trailing: false }),
+    iHaveTransfered: debounce(async function () {
+      try {
+        this.$nuxt.$emit('WAIT_DIALOG', true)
+        await console.log('WAIT')
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$emit('ihavetransfered')
+      } catch (error) {
+        this.$nuxt.$emit('WAIT_DIALOG', false)
+        this.$nuxt.$emit('EAT_SNACKBAR', {
+          view: true,
+          color: 'error',
+          message: error
+        })
+      }
+    }, 1000, { leading: true, trailing: false })
   }
 }
 </script>
