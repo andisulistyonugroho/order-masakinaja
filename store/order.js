@@ -132,10 +132,6 @@ export const actions = {
         .eq('status', input.status)
         .eq('is_active', true)
 
-      // if (input.status === 1) {
-      //   query = query.is('payment_id', null)
-      // }
-
       const { data, error } = await query
       if (error) { throw error }
 
@@ -152,6 +148,19 @@ export const actions = {
         .from('orders')
         .update({ payment_id: input.payment_id })
         .in('id', input.selected_order_id)
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async removeOrderPaymentByPaymentId ({ commit }, paymentId) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .update({ payment_id: null })
+        .eq('payment_id', paymentId)
       if (error) { throw error }
 
       return Promise.resolve(data)
