@@ -1,5 +1,8 @@
 <template>
-  <LazyInvoiceIndex v-if="profile.acl_role === 'member'" />
+  <div>
+    <LazyInvoiceIndex v-if="profile.acl_role === 'member'" />
+    <LazyAdminInvoiceIndex v-if="profile.acl_role === 'superadmin'" />
+  </div>
 </template>
 <script>
 import { mapState } from 'vuex'

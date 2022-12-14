@@ -187,7 +187,7 @@ Vue.filter('toDuration', (val) => {
 Vue.filter('orderStatus', (val) => {
   let state = 'False'
   if (val === 1) {
-    state = 'Belum dibayar'
+    state = 'Belum lunas'
   } else if (val === 2) {
     state = 'Menunggu konfirmasi'
   } else if (val === 3) {
@@ -205,7 +205,11 @@ Vue.filter('paymentStatus', (val) => {
   if (val === 1) {
     state = 'Belum lunas'
   } else if (val === 2) {
-    state = 'Lunas'
+    state = 'Perlu Verifikasi'
+  } else if (val === 3) {
+    state = 'Terbayar'
+  } else if (val === 4) {
+    state = 'Refund'
   } else if (val === 0) {
     state = 'Batal'
   }

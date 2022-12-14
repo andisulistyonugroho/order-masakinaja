@@ -5,6 +5,7 @@
 // 4: refund
 // 0: canceled
 export const state = () => ({
+  paymentByStatus: []
 })
 
 export const actions = {
@@ -30,12 +31,36 @@ export const actions = {
   },
   async updatePaymentStatus ({ commit }, input) {
     try {
+      const setUpdate = { status: input.status }
+      console.log('STATUS:', input.status)
+      if (input.status === 2) {
+        setUpdate.paid_at = new Date()
+      } else if (input.status === 3) {
+        setUpdate.admin_confirmed_at = new Date()
+        console.log('tiga')
+      }
+      console.log('setupdate:', setUpdate)
       const { data, error } = await this.$supabase
         .from('payments')
-        .update({ status: input.status })
+        .update(setUpdate)
         .eq('id', input.paymentId)
       if (error) { throw error }
 
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async getPaymentByStatus ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('payments')
+        .select(`*,
+        orders(*)`)
+        .eq('status', input.status)
+      if (error) { throw error }
+
+      commit('setPaymentByStatus', data)
       return Promise.resolve(data)
     } catch (error) {
       return Promise.reject(error)
@@ -44,4 +69,7 @@ export const actions = {
 }
 
 export const mutations = {
+  setPaymentByStatus (state, data) {
+    state.paymentByStatus = data
+  }
 }
