@@ -20,7 +20,7 @@
       </v-col>
     </v-row>
     <v-list two-line>
-      <v-list-item-group id="invoices-unpaid">
+      <v-list-item-group v-if="unPaid" id="invoices-unpaid">
         <v-list-item v-for="payment in unPaid" :key="payment.id" @click="viewInvoice(payment)">
           <v-list-item-content>
             <v-list-item-title>
@@ -59,11 +59,14 @@
             </template>
           </v-list-item>
         </template>
-        <template v-else>
+        <template v-else-if="tab === 4">
           <v-list-item v-for="row in invoices" :key="row.id" @click="selectingOrder(row)">
             <template #default="{active}">
               <v-list-item-content>
                 <v-list-item-title>
+                  <div class="caption primary--text">
+                    inv-masakinaja-{{ row.payment_id }}
+                  </div>
                   {{ row.childrens.call_name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>{{ row.order_date|toDayDate }}</v-list-item-subtitle>
@@ -141,9 +144,9 @@ export default {
       orderIds: [],
       items: [
         { value: 1, text: 'Belum Lunas' },
-        { value: 3, text: 'Sedang dicek' },
-        { value: 4, text: 'Lunas' },
-        { value: 5, text: 'Refund' }
+        { value: 2, text: 'Sedang dicek' },
+        { value: 3, text: 'Lunas' },
+        { value: 4, text: 'Refund' }
       ],
       selectedOrder: [],
       confirmInvoiceGeneratingDialog: false,
@@ -168,22 +171,21 @@ export default {
       return this.totalBill - this.totalPaid
     },
     unPaid () {
-      if (this.tab === 1) {
-        const unpaid = []
-        for (const row of this.invoices) {
-          const index = unpaid.findIndex(obj => obj.id === row.payment_id)
-          if (index >= 0) {
-            unpaid[index].orders.push(row)
-          } else if (row.payments) {
-            const l = row.payments
-            l.orders = [row]
-            unpaid.push(l)
-          }
+      // if (this.tab !== 1) {
+      // return []
+      // }
+      const unpaid = []
+      for (const row of this.invoices) {
+        const index = unpaid.findIndex(obj => obj.id === row.payment_id)
+        if (index >= 0) {
+          unpaid[index].orders.push(row)
+        } else if (row.payments) {
+          const l = row.payments
+          l.orders = [row]
+          unpaid.push(l)
         }
-        return unpaid
-      } else {
-        return []
       }
+      return unpaid
     },
     unInvoiced () {
       if (this.tab === 1) {
@@ -262,8 +264,12 @@ export default {
     }),
     viewInvoice (payment) {
       this.orderIds = []
-      this.invoiceDialog = true
       this.selectedPayment = payment
+      if (payment.status === 1) {
+        this.invoiceDialog = true
+      } else {
+        this.invoiceStatusDialog = true
+      }
     },
     async closeIt () {
       this.invoiceDialog = false

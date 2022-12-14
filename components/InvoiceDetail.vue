@@ -164,10 +164,13 @@ export default {
     iHaveTransfered: debounce(async function () {
       try {
         this.$nuxt.$emit('WAIT_DIALOG', true)
-        await console.log('WAIT')
+        await this.$store.dispatch('payment/updatePaymentStatus', { status: 2, paymentId: this.data.id })
+        await this.$store.dispatch('order/updateOrderStatusByPaymentID', { status: 2, paymentId: this.data.id })
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$emit('ihavetransfered')
       } catch (error) {
+        await this.$store.dispatch('payment/updatePaymentStatus', { status: 1, paymentId: this.data.id })
+        await this.$store.dispatch('order/updateOrderStatusByPaymentID', { status: 1, paymentId: this.data.id })
         this.$nuxt.$emit('WAIT_DIALOG', false)
         this.$nuxt.$emit('EAT_SNACKBAR', {
           view: true,

@@ -1,3 +1,9 @@
+// Order status
+// 1: new
+// 2: bank check
+// 3: paid
+// 4: refund
+// 0: canceled
 export const state = () => ({
   menu: {},
   orders: [],
@@ -148,6 +154,19 @@ export const actions = {
         .from('orders')
         .update({ payment_id: input.payment_id })
         .in('id', input.selected_order_id)
+      if (error) { throw error }
+
+      return Promise.resolve(data)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  },
+  async updateOrderStatusByPaymentID ({ commit }, input) {
+    try {
+      const { data, error } = await this.$supabase
+        .from('orders')
+        .update({ status: input.status })
+        .eq('payment_id', input.paymentId)
       if (error) { throw error }
 
       return Promise.resolve(data)

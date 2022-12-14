@@ -1,3 +1,9 @@
+// payment status
+// 1: unpaid
+// 2: verifying
+// 3: paid
+// 4: refund
+// 0: canceled
 export const state = () => ({
 })
 
