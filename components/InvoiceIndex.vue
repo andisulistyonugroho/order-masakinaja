@@ -65,7 +65,7 @@
               <v-list-item-content>
                 <v-list-item-title>
                   <div class="caption primary--text">
-                    inv-masakinaja-{{ row.payment_id }}
+                    inv-{{ data.created_at|toInvoice }}-{{ row.payment_id }}
                   </div>
                   {{ row.childrens.call_name }}
                 </v-list-item-title>

@@ -19,7 +19,7 @@
           <v-row class="px-3">
             <v-col cols="6" class="text-uppercase font-weight-bold">
               <v-chip color="white" class="px-0">
-                inv-masakinaja-{{ data.id }}
+                inv-{{ data.created_at|toInvoice }}-{{ data.id }}
               </v-chip>
             </v-col>
             <v-col cols="6" class="text-right">

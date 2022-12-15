@@ -5,17 +5,40 @@
       :items="items"
       label="Status"
       class="px-3"
+      append-outer-icon="mdi-filter-variant"
+      @click:append-outer="showFilter = !showFilter"
     />
+    <v-card v-show="showFilter" flat>
+      <v-card-text>
+        <v-text-field
+          dense
+          class="caption"
+          label="Cari Invoice ID"
+        />
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn small color="primary" text depressed>
+          batal
+        </v-btn>
+        <v-btn small color="primary" depressed tile>
+          cari
+        </v-btn>
+      </v-card-actions>
+    </v-card>
 
     <v-list two-line dense outlined>
       <v-list-item-group>
         <v-list-item v-for="row in paymentByStatus" :key="row.id">
           <v-list-item-content @click="openInvoice(row)">
             <v-list-item-title class="text-uppercase">
-              inv-masakinaja-{{ row.id }}
+              inv-{{ row.created_at|toInvoice }}-{{ row.id }}
             </v-list-item-title>
             <v-list-item-subtitle class="primary--text">
               Rp{{ row.amount+paymentUniqueCode | toMoney }}
+            </v-list-item-subtitle>
+            <v-list-item-subtitle class="caption">
+              {{ row.created_at|toDayDate }}
             </v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
@@ -49,7 +72,8 @@ export default {
         { value: 4, text: 'Refund' }
       ],
       invoiceDialog: false,
-      selectedInvoice: null
+      selectedInvoice: null,
+      showFilter: false
     }
   },
   computed: {

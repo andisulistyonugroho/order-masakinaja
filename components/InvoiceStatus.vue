@@ -36,7 +36,7 @@
               Tim kami sedang memproses transaksimu. Terimakasih sudah menunggu :)
             </v-col>
             <v-col class="text-uppercase black--text" cols="6">
-              inv-masakinaja-{{ data.id }}
+              in-{{ data.created_at|toInvoice }}-{{ data.id }}
             </v-col>
             <v-col cols="6" class="text-right primary--text">
               Lihat Invoice
@@ -126,7 +126,10 @@ export default {
     },
     openWa: debounce(function (phonenumber) {
       const phone = phonenumber.replace('0', '62')
-      const message = `Assalamu'alaikum admin, berikut bukti transfer saya untuk INV-MASAKINAJA-${this.data.id}`
+      const invoiceNumber = this.dayjs(this.data.created_at)
+        .local()
+        .format('YYYYMMDD')
+      const message = `Assalamu'alaikum admin, berikut bukti transfer saya untuk INV-{${invoiceNumber}}-${this.data.id}`
       window.open(
         `https://api.whatsapp.com/send?phone=${phone}&text=${message}`,
         '_blank'

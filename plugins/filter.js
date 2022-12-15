@@ -42,6 +42,14 @@ Vue.filter('toSimpleDate', val =>
     : '-'
 )
 
+Vue.filter('toInvoice', val =>
+  val
+    ? dayjs(val)
+      .local()
+      .format('YYYYMMDD')
+    : '-'
+)
+
 Vue.filter('timeFromNow', (val) => {
   return dayjs(val).fromNow()
 })
