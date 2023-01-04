@@ -151,7 +151,7 @@ export default {
           await this.registerCustomer(request)
           await this.loginAct({
             email: `${wa}@masakinaja.com`,
-            password: `${wa}-istaiddu`
+            password: '12345678'
           })
           this.$nuxt.$emit('WAIT_DIALOG', false)
           this.$nuxt.$emit('EAT_SNACKBAR', {
