@@ -84,6 +84,7 @@
               <v-card-text class="greylight">
                 <div class="text-center">
                   Lupa password hubungi admin
+                  {{ aphone }}
                 </div>
               </v-card-text>
             </v-card>
@@ -109,7 +110,8 @@ export default {
       v => !!v || 'E-mail is required',
       v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
     ],
-    showP: false
+    showP: false,
+    aphone: process.env.ADMINPHONE
   }),
   mounted () {
     // this.$validator.localize('en', this.dictionary)
