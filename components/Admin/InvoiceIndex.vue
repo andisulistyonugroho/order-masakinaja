@@ -35,7 +35,7 @@
               inv-{{ row.created_at|toInvoice }}-{{ row.id }}
             </v-list-item-title>
             <v-list-item-subtitle class="primary--text">
-              Rp{{ row.amount+paymentUniqueCode | toMoney }}
+              Rp{{ row.amount | toMoney }}
             </v-list-item-subtitle>
             <v-list-item-subtitle class="caption">
               {{ row.created_at|toDayDate }}
@@ -63,7 +63,6 @@ import debounce from 'lodash.debounce'
 export default {
   data () {
     return {
-      paymentUniqueCode: parseInt(20),
       tab: 2,
       items: [
         { value: 1, text: 'Belum Lunas' },

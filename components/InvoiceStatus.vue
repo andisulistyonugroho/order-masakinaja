@@ -64,13 +64,13 @@
               <span class="black--text">Total Pembayaran</span>
               <v-text-field
                 prefix="Rp"
-                :value="(data.amount+20)|toMoney"
+                :value="data.amount|toMoney"
                 readonly
                 solo
                 flat
                 background-color="white"
                 append-icon="mdi-content-copy"
-                @click:append="copy2Clipboard(data.amount+20)"
+                @click:append="copy2Clipboard(data.amount)"
               />
             </v-col>
           </v-row>

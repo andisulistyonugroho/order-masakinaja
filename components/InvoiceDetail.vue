@@ -45,12 +45,6 @@
             <v-col cols="6" class="text-right font-weight-bold">
               Rp{{ data.amount | toMoney }}
             </v-col>
-            <v-col cols="6" class="font-weight-bold black--text">
-              Kode Unik
-            </v-col>
-            <v-col cols="6" class="text-right font-weight-bold">
-              20
-            </v-col>
           </v-row>
           <v-row class="px-3" style="background-color:#e1e5e8">
             <v-col cols="2">
@@ -74,13 +68,13 @@
               <span class="black--text">Total Pembayaran</span>
               <v-text-field
                 prefix="Rp"
-                :value="(data.amount+20)|toMoney"
+                :value="data.amount|toMoney"
                 readonly
                 solo
                 flat
                 background-color="white"
                 append-icon="mdi-content-copy"
-                @click:append="copy2Clipboard(data.amount+20)"
+                @click:append="copy2Clipboard(data.amount)"
               />
             </v-col>
           </v-row>

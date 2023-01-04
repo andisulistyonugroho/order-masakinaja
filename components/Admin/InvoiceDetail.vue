@@ -46,16 +46,10 @@
               Rp{{ data.amount | toMoney }}
             </v-col>
             <v-col cols="6" class="black--text">
-              Kode Unik
-            </v-col>
-            <v-col cols="6" class="text-right font-weight-bold">
-              20
-            </v-col>
-            <v-col cols="6" class="black--text">
               Total Pembayaran
             </v-col>
             <v-col cols="6" class="text-right font-weight-bold">
-              Rp{{ (data.amount+20)|toMoney }}
+              Rp{{ data.amount|toMoney }}
             </v-col>
             <v-col cols="3" class="black--text">
               Tujuan
