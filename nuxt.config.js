@@ -5,7 +5,8 @@ export default {
     version: '1.0',
     storage: 'attachments',
     container: 'masakinaja',
-    cdn: 'https://masakinaja.sgp1.cdn.digitaloceanspaces.com'
+    cdn: 'https://masakinaja.sgp1.cdn.digitaloceanspaces.com',
+    ADMINPHONE: process.env.ADMINPHONE
   },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
